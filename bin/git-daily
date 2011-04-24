@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+if (!ini_get('register_argc_argv')) {
+    echo <<<E
+git-daily: Fatal: please enable register_argv_argc on your php.ini.
+E;
+    exit;
+}
+
+ini_set('max_execution_time', 0);
+ini_set('memory_limit', -1);
+
+require_once 'Git/Daily.php';
+
+try {
+    Git_Daily::run($argc, $argv);
+} catch (Exception $e) {
+    //echo "git-daily: Fatal: catched some exception: {$e->getMessage()}", PHP_EOL;
+}
