@@ -5,6 +5,11 @@
 
 class Git_Daily_CommandUtil
 {
+    public static function get()
+    {
+        return fgets(STDIN);
+    }
+
     public static function cmd($cmd, $options, array $pipe = array())
     {
         $cmd_string = self::buildCmdString($cmd, $options, $pipe);

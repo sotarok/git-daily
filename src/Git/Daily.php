@@ -7,6 +7,7 @@ require_once 'Git/Daily/Exception.php';
 require_once 'Git/Daily/CommandUtil.php';
 require_once 'Git/Daily/CommandAbstract.php';
 require_once 'Git/Daily/OptionParser.php';
+require_once 'Git/Daily/GitUtil.php';
 
 class Git_Daily
 {
@@ -15,10 +16,17 @@ class Git_Daily
 
     const USAGE_SPACE = 4;
 
-    const E_GIT_NOT_FOUND        = 100;
-    const E_NOT_IN_REPO          = 101;
-    const E_NOT_INITIALIZED      = 102;
-    const E_SUBCOMMAND_NOT_FOUND = 200;
+    const E_GIT_NOT_FOUND           = 100;
+    const E_GIT_STATUS_NOT_CLEAN    = 101;
+
+    const E_NOT_IN_REPO             = 201;
+    const E_NOT_INITIALIZED         = 202;
+
+    const E_SUBCOMMAND_NOT_FOUND    = 300;
+    const E_NO_SUCH_CONIFIG         = 301;
+    const E_INVALID_CONIFIG_VALUE   = 302;
+    const E_INVALID_ARGS            = 303;
+    const E_RELEASE_CANNOT_OPEN     = 304;
 
     public static $git = null;
 
@@ -90,7 +98,9 @@ class Git_Daily
 
         try {
             $result = Git_Daily_CommandAbstract::runSubCommand($subcommand, $argv);
-            call_user_func_array('Git_Daily_CommandAbstract::outLn', $result);
+            if ($result !== null) {
+                call_user_func_array('Git_Daily_CommandAbstract::outLn', $result);
+            }
         } catch (Git_Daily_Exception $e) {
             if (!$e->isShowUsage()) {
                 fwrite(STDERR, self::COMMAND . ': fatal: ' .  $e->getMessage() . PHP_EOL);
@@ -98,28 +108,30 @@ class Git_Daily
         }
     }
 
-    public static function usage($subcommand = null)
+    public static function usage($subcommand = null, $only_subcommand = false)
     {
-        fwrite(STDERR, <<<E
+        if ($subcommand === null && !$only_subcommand) {
+            fwrite(STDERR, <<<E
 git-daily:
 
 Usage:
 
 E
-);
-        $max = 0;
-        $lists = self::getSubCommandList();
-        foreach ($lists as $list) {
-            if (strlen($list) > $max) {
-                $max = strlen($list);
+            );
+            $lists = self::getSubCommandList();
+            $max = 0;
+            foreach ($lists as $list) {
+                if (strlen($list) > $max) {
+                    $max = strlen($list);
+                }
             }
-        }
-        foreach ($lists as $list) {
-            fwrite(STDERR, "    ");
-            fwrite(STDERR, str_pad($list, $max + self::USAGE_SPACE, ' '));
-            $command = self::getSubCommand($list);
-            fwrite(STDERR, constant("$command::DESCRIPTION"));
-            fwrite(STDERR, PHP_EOL);
+            foreach ($lists as $list) {
+                fwrite(STDERR, "    ");
+                fwrite(STDERR, str_pad($list, $max + self::USAGE_SPACE, ' '));
+                $command = self::getSubCommand($list);
+                fwrite(STDERR, constant("$command::DESCRIPTION"));
+                fwrite(STDERR, PHP_EOL);
+            }
         }
 
         if ($subcommand !== null) {
