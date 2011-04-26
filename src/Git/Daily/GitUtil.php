@@ -12,6 +12,31 @@ class Git_Daily_GitUtil
         return empty($res);
     }
 
+    public static function branches()
+    {
+        list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color'),
+            array(
+                'sed', array('s/*\?\s\+//g'),
+            )
+        );
+        return $res;
+    }
+
+    public static function hasBranch($branch)
+    {
+        $branches = self::branches();
+        return in_array($branch, $branches);
+    }
+
+    public static function hasRemoteBranch($remote, $branch)
+    {
+        $remote_branch = self::remoteBranch($remote, $branch);
+        if ($remote != null) {
+            return true;
+        }
+        return false;
+    }
+
     public static function currentBranch()
     {
         // git branch --no-color | grep '^\* ' | grep -v 'no branch' | sed 's/^* //g'
@@ -43,7 +68,11 @@ class Git_Daily_GitUtil
                 )
             )
         );
-        return array_shift($res);
+        if (!empty($res)) {
+            return array_shift($res);
+        } else {
+            return null;
+        }
     }
 }
 

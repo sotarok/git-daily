@@ -16,5 +16,6 @@ require_once 'Git/Daily.php';
 try {
     Git_Daily::run($argc, $argv);
 } catch (Exception $e) {
-    //echo "git-daily: Fatal: catched some exception: {$e->getMessage()}", PHP_EOL;
+    // ここにはこない
+    exit(255);
 }

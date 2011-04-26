@@ -48,6 +48,14 @@ class Git_Daily_Command_Release
 
     private function _doOpen()
     {
+        // get current branch
+        $current_branch = Git_Daily_GitUtil::currentBranch();
+        if ($current_branch != $this->config['develop']) {
+            throw new Git_Daily_Exception(
+                "currently not on {$this->config['develop']} but on $current_branch"
+            );
+        }
+
         // check if current release process opened
         $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release")));
         if (!empty($release_branches)) {
@@ -66,7 +74,9 @@ class Git_Daily_Command_Release
             self::cmd(Git_Daily::$git, array('fetch', '--all'));
 
             $remote = $this->config['remote'];
-            $release_branches = self::cmd(Git_Daily::$git, array('branch', '-a'), array('grep', array("remotes/$remote/release")));
+            $release_branches = self::cmd(Git_Daily::$git, array('branch', '-a'),
+                array('grep', array("remotes/$remote/release"))
+            );
 
             if (!empty($release_branches)) {
                 $release_branches = implode(',', $release_branches);
@@ -78,14 +88,162 @@ class Git_Daily_Command_Release
                 );
             }
         }
+
+        $new_release_branch = 'release/' . date('Ymd-Hi');
+        // confirmation
+        if (!Git_Daily_CommandUtil::yesNo("Confirm: create branch $new_release_branch from $current_branch ?",
+            Git_Daily_CommandUtil::YESNO_NO)) {
+            throw new Git_Daily_Exception('abort');
+        }
+
+        // create release branch
+        self::info("create release branch: $new_release_branch");
+        $res = self::cmd(Git_Daily::$git, array('branch', $new_release_branch));
+        if (isset($this->config['remote'])) {
+            $remote = $this->config['remote'];
+            self::info("push to remote: $remote");
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('push', $remote, $new_release_branch));
+            if ($retval != 0) {
+                self::warn('push failed');
+                self::outLn($res);
+
+                self::cmd(Git_Daily::$git, array('branch', '-d', $new_release_branch));
+                self::info('rollback (delete branch)');
+
+                throw new Git_Daily_Exception('abort');
+            }
+            self::out($res);
+        }
+
+        self::cmd(Git_Daily::$git, array('checkout', $new_release_branch));
+        return 'release opened';
     }
 
+    /**
+     *  _doSync
+     *
+     *  Sync release process:
+     *  1. If remote release process opened and local have no release branch, then checkout it.
+     *  2. If remote release process opened and also local have a release branch, then pull/push.
+     *  3. If remote release process closed and still local have a release branch, clean up it.
+     *  4. If remote release process closed and also local have no release branch, do nothing.
+     */
     private function _doSync()
     {
+        $current_branch = Git_Daily_GitUtil::currentBranch();
+
+        if (!isset($this->config['remote'])) {
+            throw new Git_Daily_Exception('remote not setted, cannot sync');
+        }
+        $remote = $this->config['remote'];
+        $develop_branch = $this->config['develop'];
+        self::info('first, fetch remotes');
+        self::cmd(Git_Daily::$git, array('fetch', '--all'));
+        self::info('cleanup remote');
+        self::cmd(Git_Daily::$git, array('remote', 'prune', $remote));
+
+        // if has local branch, try to checkout
+        $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
+            array(
+                'sed', array('s/*\?\s\+//g'),
+            )
+        ));
+
+        // remote branch still exists ?
+        $remote_closed = false;
+        $remote_release_branches = self::cmd(Git_Daily::$git, array('branch', '-a'),
+            array('grep', array("remotes/$remote/release"),
+                array(
+                    'sed', array('s/*\?\s\+//g'),
+                )
+            )
+        );
+        if (!empty($remote_release_branches) && count($remote_release_branches) == 1) {
+            $remote_release_branch = array_shift($remote_release_branches);
+        } else {
+            if (empty($remote_release_branches)) {
+                // to clean up
+                $remote_closed = true;
+            }
+            else {
+                throw new Git_Daily_Exception('there are a number of remote release branches');
+            }
+        }
+
+        // release branch already checkouted, try push, pull
+        if (!empty($release_branches)) {
+            // checkout
+            if (count($release_branches) == 1) {
+                $release_branch = array_shift($release_branches);
+            } else {
+                throw new Git_Daily_Exception('there are a number of local release branches');
+            }
+
+            // if remote closed, local still have release branch, then cleanup
+            if ($remote_closed) {
+                self::info('release closed! so cleanup local release branch');
+                self::info("checkout $develop_branch");
+                Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('checkout', $develop_branch));
+                list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('daily', 'pull'));
+                self::outLn($res);
+                self::info("delete $release_branch");
+                list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '-d', $release_branch));
+                self::outLn($res);
+                if ($retval != 0) {
+                    self::warn('branch delete failed');
+                    self::outLn("\n     git branch delete failed, please manually\n");
+                }
+                return "sync to release close";
+            }
+
+            if ($current_branch != $release_branch) {
+                self::info("checkout $release_branch");
+                self::cmd(Git_Daily::$git, array('checkout', $release_branch));
+                $current_branch = Git_Daily_GitUtil::currentBranch();
+            }
+
+            // first, pull
+            self::info("git pull");
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('daily', 'pull'));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn('failed to pull from remote');
+                throw new Git_Daily_Exception('abort');
+            }
+
+            // push
+            self::info("git push");
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('daily', 'push'));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn('failed to push to remote');
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+        else {
+            // first time checkout release branch
+            if ($remote_closed) {
+                // do nothing
+                return 'sync completed (nothing to do)';
+            }
+
+            $remote_release_branch = str_replace("remotes/$remote/", '', $remote_release_branch);
+            self::info("checkout and tracking $remote_release_branch");
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('checkout', $remote_release_branch));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn('failed to checkout');
+                throw new Git_Daily_Exception('abort');
+            }
+            return 'start to tracking release branch';
+        }
     }
 
     private function _doClose()
     {
+        // merge to master
+        // merge to develop
+        return 'release closed';
     }
 
     public static function usage()

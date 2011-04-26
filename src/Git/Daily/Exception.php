@@ -7,7 +7,7 @@
 class Git_Daily_Exception
     extends Exception
 {
-    public function __construct($message = "", $code = 0, $prev = null, $show_usage = false, $subcommand = null)
+    public function __construct($message = "", $code = 255, $prev = null, $show_usage = false, $subcommand = null)
     {
         if (version_compare(PHP_VERSION, '5.3.0') < 0) {
             parent::__construct($message, $code);

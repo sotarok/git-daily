@@ -44,6 +44,31 @@ class Git_Daily_Command_Init
             }
             self::cmd(Git_Daily::$git, array('config', 'gitdaily.remote', $first_choise));
             self::outLn('Your remote is [%s]', $first_choise);
+
+            $remote =  $first_choise;
+        }
+
+        // master branch
+        self::out('Name master branch [master]: ');
+        $master_branch = trim(Git_Daily_CommandUtil::get());
+        if (empty($master_branch)) {
+            $master_branch = 'master';
+        }
+        self::cmd(Git_Daily::$git, array('config', 'gitdaily.master', $master_branch));
+
+        // develop branch
+        self::out('Name develop branch [develop]: ');
+        $develop_branch = trim(Git_Daily_CommandUtil::get());
+        if (empty($develop_branch)) {
+            $develop_branch = 'develop';
+        }
+        self::cmd(Git_Daily::$git, array('config', 'gitdaily.develop', $develop_branch));
+        if (!Git_Daily_GitUtil::hasBranch($develop_branch)) {
+            if (Git_Daily_GitUtil::hasRemoteBranch($remote, $develop_branch)) {
+                self::cmd(Git_Daily::$git, array('checkout', $develop_branch));
+            } else {
+                self::cmd(Git_Daily::$git, array('checkout', '-b', $develop_branch));
+            }
         }
 
         // initialized

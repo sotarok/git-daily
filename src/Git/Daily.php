@@ -16,19 +16,19 @@ class Git_Daily
 
     const USAGE_SPACE = 4;
 
-    const E_GIT_NOT_FOUND           = 100;
-    const E_GIT_STATUS_NOT_CLEAN    = 101;
-    const E_GIT_PUSH_FAILED         = 102;
-    const E_GIT_PULL_FAILED         = 103;
+    const E_GIT_NOT_FOUND           = 1;
+    const E_GIT_STATUS_NOT_CLEAN    = 2;
+    const E_GIT_PUSH_FAILED         = 3;
+    const E_GIT_PULL_FAILED         = 4;
 
-    const E_NOT_IN_REPO             = 201;
-    const E_NOT_INITIALIZED         = 202;
+    const E_NOT_IN_REPO             = 101;
+    const E_NOT_INITIALIZED         = 102;
 
-    const E_SUBCOMMAND_NOT_FOUND    = 300;
-    const E_NO_SUCH_CONIFIG         = 301;
-    const E_INVALID_CONIFIG_VALUE   = 302;
-    const E_INVALID_ARGS            = 303;
-    const E_RELEASE_CANNOT_OPEN     = 304;
+    const E_SUBCOMMAND_NOT_FOUND    = 200;
+    const E_NO_SUCH_CONIFIG         = 201;
+    const E_INVALID_CONIFIG_VALUE   = 202;
+    const E_INVALID_ARGS            = 203;
+    const E_RELEASE_CANNOT_OPEN     = 204;
 
     public static $git = null;
 
@@ -107,6 +107,7 @@ class Git_Daily
             if (!$e->isShowUsage()) {
                 fwrite(STDERR, self::COMMAND . ': fatal: ' .  $e->getMessage() . PHP_EOL);
             }
+            exit($e->getCode());
         }
     }
 

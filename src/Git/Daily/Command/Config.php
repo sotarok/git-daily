@@ -14,6 +14,8 @@ class Git_Daily_Command_Config
 
     private $_config_key_list = array(
         'remote',
+        'develop',
+        'master',
     );
 
     public function runCommand()
@@ -46,6 +48,12 @@ class Git_Daily_Command_Config
         case 'remote':
             $this->_setConfigRemote($value);
             break;
+        case 'develop':
+            $this->_setConfigDevelop($value);
+            break;
+        case 'master':
+            $this->_setConfigMaster($value);
+            break;
         default:
             throw new Git_Daily_Exception(
                 sprintf("invalid config key, allowed key is: %s", implode(',', $this->_config_key_list)),
@@ -77,10 +85,37 @@ class Git_Daily_Command_Config
         );
     }
 
+    private function _setConfigDevelop($value)
+    {
+        // branch check
+        $branches = Git_Daily_GitUtil::branches();
+        if (!in_array($value, $branches)) {
+            throw new Git_Daily_Exception("no such branch: $value");
+        }
+
+        self::cmd(Git_Daily::$git, array('config', 'gitdaily.develop', $value));
+        self::outLn('config setted');
+    }
+
+    private function _setConfigMaster($value)
+    {
+        // branch check
+        $branches = Git_Daily_GitUtil::branches();
+        if (!in_array($value, $branches)) {
+            throw new Git_Daily_Exception("no such branch: $value");
+        }
+
+        self::cmd(Git_Daily::$git, array('config', 'gitdaily.master', $value));
+        self::outLn('config setted');
+    }
+
     public static function usage()
     {
         fwrite(STDERR, <<<E
 Usage: git daily config <key> <value>
+
+Example:
+       git daily config remote origin
 
 E
         );
