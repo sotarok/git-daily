@@ -91,11 +91,9 @@ class Git_Daily_Command_Release
     public static function usage()
     {
         fwrite(STDERR, <<<E
-
-Usage: release
-    git daily release open        Open daily-release process
-    git daily release sync        Sync current opened release process
-    git daily release close       Close to daily-release process
+Usage: git daily release open        : Open daily-release process
+   or: git daily release sync        : Sync current opened release process
+   or: git daily release close       : Close to daily-release process
 
 E
         );

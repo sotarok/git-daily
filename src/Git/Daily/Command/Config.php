@@ -9,7 +9,7 @@ class Git_Daily_Command_Config
     const DESCRIPTION = 'Set or show config';
 
     protected $option = array(
-        array('l', 'list'),
+        'list' => array('l', 'list'),
     );
 
     private $_config_key_list = array(
@@ -80,9 +80,7 @@ class Git_Daily_Command_Config
     public static function usage()
     {
         fwrite(STDERR, <<<E
-
-Usage: config
-    git daily config <key> <value>
+Usage: git daily config <key> <value>
 
 E
         );

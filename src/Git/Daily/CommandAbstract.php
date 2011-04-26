@@ -34,6 +34,14 @@ abstract class Git_Daily_CommandAbstract
         }
     }
 
+    public static function warn($msg)
+    {
+        self::out("[41;37m");
+        self::out('[WARNING] ' . $msg);
+        self::out("[0m");
+        self::out(PHP_EOL);
+    }
+
     public static function info($msg)
     {
         self::out("[44;37m");

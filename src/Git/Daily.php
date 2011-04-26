@@ -18,6 +18,8 @@ class Git_Daily
 
     const E_GIT_NOT_FOUND           = 100;
     const E_GIT_STATUS_NOT_CLEAN    = 101;
+    const E_GIT_PUSH_FAILED         = 102;
+    const E_GIT_PULL_FAILED         = 103;
 
     const E_NOT_IN_REPO             = 201;
     const E_NOT_INITIALIZED         = 202;
