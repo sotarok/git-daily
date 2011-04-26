@@ -1,8 +1,14 @@
 <?php
 /**
- *
+ *  @package    Git
+ *  @author     Sotaro Karasawa <sotaro.k@gmail.com>
  */
 
+/**
+ *  Git_Daily_Command_Release
+ *
+ *  @package    Git
+ */
 class Git_Daily_Command_Release
     extends Git_Daily_CommandAbstract
 {
@@ -13,6 +19,9 @@ class Git_Daily_Command_Release
     protected $option = array(
     );
 
+    /**
+     *  runCommand
+     */
     public function runCommand()
     {
         $is_clean = Git_Daily_GitUtil::isClean();
@@ -46,6 +55,12 @@ class Git_Daily_Command_Release
         return call_user_func(array($this, $method));
     }
 
+    /**
+     *  Open and start release process
+     *
+     *  @throws Git_Daily_Exception
+     *  @return string
+     */
     private function _doOpen()
     {
         // get current branch
@@ -127,6 +142,9 @@ class Git_Daily_Command_Release
      *  2. If remote release process opened and also local have a release branch, then pull/push.
      *  3. If remote release process closed and still local have a release branch, clean up it.
      *  4. If remote release process closed and also local have no release branch, do nothing.
+     *
+     *  @throws Git_Daily_Exception
+     *  @return string
      */
     private function _doSync()
     {
@@ -239,10 +257,126 @@ class Git_Daily_Command_Release
         }
     }
 
+    /**
+     *  Close release process
+     *
+     *  @throws Git_Daily_Exception
+     *  @return string
+     */
     private function _doClose()
     {
-        // merge to master
-        // merge to develop
+        $release_branch = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
+            array(
+                'sed', array('s/*\?\s\+//g'),
+            )
+        ));
+        $release_branch = array_shift($release_branch);
+
+        $master_branch = $this->config['master'];
+        $develop_branch = $this->config['develop'];
+        $remote = $this->config['remote'];
+
+        if (!empty($remote)) {
+            self::info('first, fetch remotes');
+            self::cmd(Git_Daily::$git, array('fetch', '--all'));
+            self::info('diff check');
+
+            $diff_branch_str1 = "{$release_branch}..{$remote}/{$release_branch}";
+            $diff_branch_str2 = "{$remote}/{$release_branch}..{$release_branch}";
+            $res1 = self::cmd(Git_Daily::$git, array('diff', $diff_branch_str1));
+            $res2 = self::cmd(Git_Daily::$git, array('diff', $diff_branch_str2));
+            if (!empty($res1) || !empty($res2)) {
+                self::warn("There are some diff between local and $remote, run release sync first.");
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
+        self::info("checkout $master_branch and merge $release_branch to $master_branch");
+        self::cmd(Git_Daily::$git, array('checkout', $master_branch));
+        // pull
+        if (!empty($remote)) {
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('daily', 'pull'));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn("$master_branch pull failed");
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
+        // merged check
+        $res = Git_Daily_GitUtil::mergedBranches();
+        if (!in_array($release_branch, $res)) {
+            // merge to master
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('merge', '--no-ff', $release_branch));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn('merge failed');
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
+        self::info("checkout $develop_branch and merge $release_branch to $develop_branch");
+        self::cmd(Git_Daily::$git, array('checkout', $develop_branch));
+        // pull
+        if (!empty($remote)) {
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('daily', 'pull'));
+            if ($retval != 0) {
+                self::outLn($res);
+                self::warn("$develop_branch pull failed");
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
+        $res = Git_Daily_GitUtil::mergedBranches();
+        if (!in_array($release_branch, $res)) {
+            // merge to develop
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('merge', '--no-ff', $release_branch));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn('merge failed');
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
+        // delere release branch
+        self::info("delete branch: $release_branch");
+        list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '-d', $release_branch));
+        self::outLn($res);
+        if ($retval != 0) {
+            self::warn("failed to delete local $release_branch");
+            throw new Git_Daily_Exception('abort');
+        }
+
+        if (!empty($remote)) {
+            // delete remote release branch
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('push', $remote, ':' . $release_branch));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn("failed to delete {$remote}'s $release_branch");
+                throw new Git_Daily_Exception('abort');
+            }
+
+            // push
+            self::info("push $master_branch to $remote");
+            self::cmd(Git_Daily::$git, array('checkout', $master_branch));
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('push', $remote, $master_branch));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn('push failed');
+                throw new Git_Daily_Exception('abort');
+            }
+
+            // push develop
+            self::info("push $develop_branch to $remote");
+            self::cmd(Git_Daily::$git, array('checkout', $develop_branch));
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('push', $remote, $develop_branch));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn('push failed');
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
         return 'release closed';
     }
 

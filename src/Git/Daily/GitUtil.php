@@ -22,6 +22,16 @@ class Git_Daily_GitUtil
         return $res;
     }
 
+    public static function mergedBranches()
+    {
+        list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color', '--merged'),
+            array(
+                'sed', array('s/*\?\s\+//g'),
+            )
+        );
+        return $res;
+    }
+
     public static function hasBranch($branch)
     {
         $branches = self::branches();
