@@ -72,7 +72,7 @@ class Git_Daily_Command_Release
         }
 
         // check if current release process opened
-        $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release")));
+        $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"), array('sed', array('s/*\?\s\+//g'))));
         if (!empty($release_branches)) {
             $release_branches = implode(',', $release_branches);
 
@@ -118,16 +118,15 @@ class Git_Daily_Command_Release
             $remote = $this->config['remote'];
             self::info("push to remote: $remote");
             list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('push', $remote, $new_release_branch));
+            self::outLn($res);
             if ($retval != 0) {
                 self::warn('push failed');
+                $res = self::cmd(Git_Daily::$git, array('branch', '-d', $new_release_branch));
                 self::outLn($res);
-
-                self::cmd(Git_Daily::$git, array('branch', '-d', $new_release_branch));
                 self::info('rollback (delete branch)');
 
                 throw new Git_Daily_Exception('abort');
             }
-            self::out($res);
         }
 
         self::cmd(Git_Daily::$git, array('checkout', $new_release_branch));
@@ -225,7 +224,6 @@ class Git_Daily_Command_Release
             list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('daily', 'pull'));
             self::outLn($res);
             if ($retval != 0) {
-                self::warn('failed to pull from remote');
                 throw new Git_Daily_Exception('abort');
             }
 
@@ -270,6 +268,9 @@ class Git_Daily_Command_Release
                 'sed', array('s/*\?\s\+//g'),
             )
         ));
+        if (empty($release_branch)) {
+            throw new Git_Daily_Exception('release branch not found. abort.');
+        }
         $release_branch = array_shift($release_branch);
 
         $master_branch = $this->config['master'];
@@ -377,6 +378,8 @@ class Git_Daily_Command_Release
             }
         }
 
+        // return to develop
+        self::cmd(Git_Daily::$git, array('checkout', $develop_branch));
         return 'release closed';
     }
 

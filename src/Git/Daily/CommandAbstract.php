@@ -44,7 +44,7 @@ abstract class Git_Daily_CommandAbstract
 
     public static function info($msg)
     {
-        self::out("[44;37m");
+        self::out("[36m");
         self::out('[INFO] ' . $msg);
         self::out("[0m");
         self::out(PHP_EOL);
