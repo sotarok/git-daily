@@ -339,24 +339,7 @@ class Git_Daily_Command_Release
             }
         }
 
-        // delere release branch
-        self::info("delete branch: $release_branch");
-        list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '-d', $release_branch));
-        self::outLn($res);
-        if ($retval != 0) {
-            self::warn("failed to delete local $release_branch");
-            throw new Git_Daily_Exception('abort');
-        }
-
         if (!empty($remote)) {
-            // delete remote release branch
-            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('push', $remote, ':' . $release_branch));
-            self::outLn($res);
-            if ($retval != 0) {
-                self::warn("failed to delete {$remote}'s $release_branch");
-                throw new Git_Daily_Exception('abort');
-            }
-
             // push
             self::info("push $master_branch to $remote");
             self::cmd(Git_Daily::$git, array('checkout', $master_branch));
@@ -378,8 +361,27 @@ class Git_Daily_Command_Release
             }
         }
 
+        // delere release branch
+        self::info("delete branch: $release_branch");
+        list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '-d', $release_branch));
+        self::outLn($res);
+        if ($retval != 0) {
+            self::warn("failed to delete local $release_branch");
+            throw new Git_Daily_Exception('abort');
+        }
+        if (!empty($remote)) {
+            // delete remote release branch
+            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('push', $remote, ':' . $release_branch));
+            self::outLn($res);
+            if ($retval != 0) {
+                self::warn("failed to delete {$remote}'s $release_branch");
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
+
         // return to develop
-        self::cmd(Git_Daily::$git, array('checkout', $develop_branch));
+        self::cmd(Git_Daily::$git, array('checkout', $master_branch));
         return 'release closed';
     }
 
