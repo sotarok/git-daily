@@ -34,9 +34,9 @@ class Git_Daily_Command_Push
         self::info("run git push $remote $current_branch");
         list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('push', $remote, $current_branch));
 
+        self::outLn($res);
         if ($retval != 0) {
             self::warn("git push failed:");
-            self::out($res);
             throw new Git_Daily_Exception(
                 "git push failed"
             );
