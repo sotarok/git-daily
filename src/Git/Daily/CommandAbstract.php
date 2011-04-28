@@ -78,7 +78,7 @@ abstract class Git_Daily_CommandAbstract
         }
         else {
             $args = func_get_args();
-            if (count($args) - 1 != preg_match('/%/', $args[0])) {
+            if (count($args) - 1 != preg_match_all('/%/', $args[0], $m)) {
                 $string = '';
                 foreach ($args as $str) {
                     $string .= $str . PHP_EOL;
