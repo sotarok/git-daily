@@ -176,6 +176,7 @@ class Git_Daily_Command_Release
 
         // remote branch still exists ?
         $remote_closed = false;
+        $remote_release_branch = null;
         $remote_release_branches = self::cmd(Git_Daily::$git, array('branch', '-a'),
             array('grep', array("remotes/$remote/release"),
                 array(
