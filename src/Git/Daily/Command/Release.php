@@ -160,14 +160,23 @@ class Git_Daily_Command_Release
         self::cmd(Git_Daily::$git, array('remote', 'prune', $remote));
 
         // if has local branch, try to checkout
+        $release_branch = false;
         $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
             array(
                 'sed', array('s/*\?\s\+//g'),
             )
         ));
+        if (!empty($release_branches)) {
+            if (count($release_branches) == 1) {
+                $release_branch = array_shift($release_branches);
+            } else {
+                throw new Git_Daily_Exception('there are a number of local release branches, please delete local release branch manually');
+            }
+        }
 
         // remote branch still exists ?
         $remote_closed = false;
+        $remote_release_branch = null;
         $remote_release_branches = self::cmd(Git_Daily::$git, array('branch', '-a'),
             array('grep', array("remotes/$remote/release"),
                 array(
@@ -177,6 +186,7 @@ class Git_Daily_Command_Release
         );
         if (!empty($remote_release_branches) && count($remote_release_branches) == 1) {
             $remote_release_branch = array_shift($remote_release_branches);
+            $remote_release_branch = str_replace("remotes/$remote/", '', $remote_release_branch);
         } else {
             if (empty($remote_release_branches)) {
                 // to clean up
@@ -188,12 +198,11 @@ class Git_Daily_Command_Release
         }
 
         // release branch already checkouted, try push, pull
-        if (!empty($release_branches)) {
+        if ($release_branch) {
             // checkout
-            if (count($release_branches) == 1) {
-                $release_branch = array_shift($release_branches);
-            } else {
-                throw new Git_Daily_Exception('there are a number of local release branches');
+            // remote release branch opened, but local has different (old ?) release branch, then clean up
+            if ($remote_release_branch != $release_branch) {
+                $remote_closed = true;
             }
 
             // if remote closed, local still have release branch, then cleanup
@@ -209,6 +218,10 @@ class Git_Daily_Command_Release
                 if ($retval != 0) {
                     self::warn('branch delete failed');
                     self::outLn("\n     git branch delete failed, please manually\n");
+                }
+
+                if ($remote_release_branch != $release_branch) {
+                    self::outLn(PHP_EOL, 'Closed old release branch', '  Please retry "release sync"', PHP_EOL);
                 }
                 return "sync to release close";
             }
@@ -243,7 +256,6 @@ class Git_Daily_Command_Release
                 return 'sync completed (nothing to do)';
             }
 
-            $remote_release_branch = str_replace("remotes/$remote/", '', $remote_release_branch);
             self::info("checkout and tracking $remote_release_branch");
             list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('checkout', $remote_release_branch));
             self::outLn($res);

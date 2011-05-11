@@ -41,9 +41,9 @@ class Git_Daily_Command_Pull
             list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('pull', $remote, $current_branch));
         }
 
+        self::outLn($res);
         if ($retval != 0) {
             self::warn("git pull failed:");
-            self::outLn($res);
             throw new Git_Daily_Exception(
                 "git pull failed"
             );
