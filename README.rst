@@ -19,40 +19,45 @@ Sub-commands are::
 Cheat Sheet
 --------------------------
 
-### Initialization
+Initialization
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To initialize, use:
-  
+To initialize, use ::
+
     git daily init
 
 
-### Configuration
+Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* To show configuration for git-daliy use:
-  
+* To show configuration for git-daliy use ::
+
     git daily config
 
-* To set the configuration use:
-  
+* To set the configuration use ::
+
     git daily config [<key>] [<value>]
 
-### Release
+Release
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* To open the release process of the day, use:
-  
+* To open the release process of the day, use ::
+
     git daily release open
 
-* To sync opened or closed daily release process, use:
-  
+* To sync opened or closed daily release process, use ::
+
     git daily release sync
 
-* To close daily release process, use:
-  
+* To close daily release process, use ::
+
     git daily release close
 
 
 License
 --------------------------
+
+::
 
      The BSD License
      
