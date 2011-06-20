@@ -16,43 +16,66 @@ Sub-commands are::
     git daily help
 
 
+Installation
+--------------------------
+
+Install from openpear.org ::
+
+    sudo pear channel-discover openpear.org
+    sudo pear install openpear/Git_Daily
+
+Install develop version ::
+
+    cd /path/to/dir
+    git clone git://github.com/sotarok/git-daily.git
+    ./git-daily/src/bin/.gen-local-git-daily.sh
+    sudo ln -s /path/to/dir/git-daily/src/bin/git-daily-local /usr/local/bin/git-daily
+    sudo ln -s /path/to/dir/git-daily/src/Git /path/to/pear/Git
+
+You can find the path ``/path/to/pear`` by the command  ``php -i | grep include_path`` .
+
 Cheat Sheet
 --------------------------
 
-### Initialization
+Initialization
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To initialize, use:
-  
+To initialize, use ::
+
     git daily init
 
 
-### Configuration
+Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* To show configuration for git-daliy use:
-  
+* To show configuration for git-daliy use ::
+
     git daily config
 
-* To set the configuration use:
-  
+* To set the configuration use ::
+
     git daily config [<key>] [<value>]
 
-### Release
+Release
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* To open the release process of the day, use:
-  
+* To open the release process of the day, use ::
+
     git daily release open
 
-* To sync opened or closed daily release process, use:
-  
+* To sync opened or closed daily release process, use ::
+
     git daily release sync
 
-* To close daily release process, use:
-  
+* To close daily release process, use ::
+
     git daily release close
 
 
 License
 --------------------------
+
+::
 
      The BSD License
      

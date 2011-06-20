@@ -26,6 +26,7 @@ class Git_Daily_Command_Init
             }
         }
 
+        $remote = null;
         if (!empty($remote_url)) {
             if (count($remote_url) >= 2) {
                 do {
@@ -64,7 +65,7 @@ class Git_Daily_Command_Init
         }
         self::cmd(Git_Daily::$git, array('config', 'gitdaily.develop', $develop_branch));
         if (!Git_Daily_GitUtil::hasBranch($develop_branch)) {
-            if (Git_Daily_GitUtil::hasRemoteBranch($remote, $develop_branch)) {
+            if ($remote !== null && Git_Daily_GitUtil::hasRemoteBranch($remote, $develop_branch)) {
                 self::cmd(Git_Daily::$git, array('checkout', $develop_branch));
             } else {
                 self::cmd(Git_Daily::$git, array('checkout', '-b', $develop_branch));

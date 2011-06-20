@@ -1,5 +1,11 @@
-#!/usr/bin/env php
+#!/usr/bin/php
 <?php
+/**
+ *  @package    Git_Daily
+ *  @author     sotarok
+ *  @license    The BSD License
+ *  @id         $Id$
+ */
 
 if (!ini_get('register_argc_argv')) {
     echo <<<E

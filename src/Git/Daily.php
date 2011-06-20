@@ -11,7 +11,7 @@ require_once 'Git/Daily/GitUtil.php';
 
 class Git_Daily
 {
-    const VERSION = '0.1.2';
+    const VERSION = '0.1.3';
     const COMMAND = 'git-daily';
 
     const USAGE_SPACE = 4;
@@ -101,6 +101,9 @@ class Git_Daily
         try {
             $result = Git_Daily_CommandAbstract::runSubCommand($subcommand, $argv);
             if ($result !== null) {
+                if (!is_array($result)) {
+                    $result = array($result);
+                }
                 call_user_func_array('Git_Daily_CommandAbstract::outLn', $result);
             }
         } catch (Git_Daily_Exception $e) {
