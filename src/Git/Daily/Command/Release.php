@@ -111,6 +111,17 @@ class Git_Daily_Command_Release
             throw new Git_Daily_Exception('abort');
         }
 
+        // pull current branch
+        if (isset($this->config['remote'])) {
+            self::info("pull $current_branch branch from remote");
+            list($res, $retval) = self::cmd(Git_Daily::$git, array('pull', 'origin', $current_branch));
+            if ($retval != 0) {
+                self::warn('pull failed');
+                self::outLn($res);
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
         // create release branch
         self::info("create release branch: $new_release_branch");
         $res = self::cmd(Git_Daily::$git, array('branch', $new_release_branch));
