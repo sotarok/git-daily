@@ -111,12 +111,15 @@ class Git_Daily_Command_Release
             throw new Git_Daily_Exception('abort');
         }
 
-        // pull current branch
+        // merge current branch
         if (isset($this->config['remote'])) {
-            self::info("pull $current_branch branch from remote");
-            list($res, $retval) = self::cmd(Git_Daily::$git, array('pull', 'origin', $current_branch));
+            //
+            // Fetch --all is already done. Just git merge.
+            //
+            self::info("merge $current_branch branch from remote");
+            list($res, $retval) = self::cmd(Git_Daily::$git, array('merge', 'origin/' . $current_branch));
             if ($retval != 0) {
-                self::warn('pull failed');
+                self::warn('merge failed');
                 self::outLn($res);
                 throw new Git_Daily_Exception('abort');
             }
