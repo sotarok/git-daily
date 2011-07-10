@@ -10,6 +10,7 @@ Sub-commands are::
     git daily push
     git daily pull
     git daily release open
+    git daily release list
     git daily release sync
     git daily release close
     git daily version
@@ -66,6 +67,21 @@ Release
 * To sync opened or closed daily release process, use ::
 
     git daily release sync
+
+* To show the release list, use::
+
+    git daily release list
+
+  ** When gitdaily.logurl is define, git-daily shows author lists with
+     logurl. git-daily replaces %s in gitdaily.logurl to a commit id. 
+
+  [config]
+  gitdaily.logurl = "http://github.com/user/git-daily/commit/%s"
+  
+  [output]
+  = userA
+  http://github.com/user/git-daily/commit/0123456789.....
+  ...
 
 * To close daily release process, use ::
 
