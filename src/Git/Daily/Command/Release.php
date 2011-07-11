@@ -111,6 +111,20 @@ class Git_Daily_Command_Release
             throw new Git_Daily_Exception('abort');
         }
 
+        // merge current branch
+        if (isset($this->config['remote'])) {
+            //
+            // Fetch --all is already done. Just git merge.
+            //
+            self::info("merge $current_branch branch from remote");
+            list($res, $retval) = self::cmd(Git_Daily::$git, array('merge', 'origin/' . $current_branch));
+            if ($retval != 0) {
+                self::warn('merge failed');
+                self::outLn($res);
+                throw new Git_Daily_Exception('abort');
+            }
+        }
+
         // create release branch
         self::info("create release branch: $new_release_branch");
         $res = self::cmd(Git_Daily::$git, array('branch', $new_release_branch));
@@ -397,10 +411,149 @@ class Git_Daily_Command_Release
         return 'release closed';
     }
 
+    private function _doList()
+    {
+        $release_branch = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
+            array(
+                'sed', array('s/*\?\s\+//g'),
+            )
+        ));
+        if (empty($release_branch)) {
+            throw new Git_Daily_Exception('release branch not found. abort.');
+        }
+        $current_branch = Git_Daily_GitUtil::currentBranch();
+        $master_branch = $this->config['master'];
+
+        //
+        // check if remote has release process
+        //
+        if (isset($this->config['remote'])) {
+            self::info('first, fetch remotes');
+            self::cmd(Git_Daily::$git, array('fetch', '--all'));
+        }
+        
+        //
+        // Get revision list using git rev-list.
+        //
+        $revision_list = array();
+        $revision_id_list = self::cmd(Git_Daily::$git, array('rev-list', "$master_branch..$current_branch"));
+        foreach ($revision_id_list as $rev_id) {
+            //
+            // Get the detail of a revision using git show.
+            //
+            $logs = self::cmd(Git_Daily::$git, array('show', $rev_id));
+
+            $revision = array();
+            $revision['id'] = $rev_id;
+            $revision['files'] = array();
+            $revision['files']['added'] = array();
+            $revision['files']['modified'] = array();
+
+            //
+            // Parse output of git show.
+            //
+            $merge = false;
+            foreach ($logs as $line) {
+                if (preg_match("/^Merge: /", $line)) {
+                    $merge = true;
+                } elseif (preg_match("/^Author: .+\<([^@]+)@([^>]+)>/", $line, $matches)) {
+                    $revision['author'] = $matches[1];
+                } elseif (preg_match("/^diff --git a\/([^ ]+) /", $line, $matches)) {
+                    $file = $matches[1];
+                } elseif (preg_match("/^new file mode/", $line)) {
+                    $revision['files']['added'][] = $file;
+                } elseif (preg_match("/^index/", $line)) {
+                    $revision['files']['modified'][] = $file;
+                }
+            }
+
+            //
+            // Skip a merge log.
+            //
+            if (!$merge) {
+                $revision_list[] = $revision;
+            }
+        }
+
+        //
+        // Merge file list
+        //
+        $modlist = array();
+        $addlist = array();
+        foreach ($revision_list as $revision) {
+            $modlist = array_merge($modlist, $revision['files']['modified']);
+            $addlist = array_merge($addlist, $revision['files']['added']);
+        }
+        sort($modlist);
+        sort($addlist);
+        $modlist = array_unique($modlist);
+        $addlist = array_unique($addlist);
+
+        //
+        // Print commit list
+        //
+        if (count($revision_list) > 0) {
+            self::outLn("Commit list:");
+            foreach ($revision_list as $revision) {
+                self::outLn("\t" . $revision['id'] . " = " . $revision['author']);
+            }
+            self::outLn("");
+        }
+
+        //
+        // Print added files
+        //
+        if (count($addlist) > 0) {
+            self::outLn("Added files:");
+            foreach ($addlist as $file) {
+                self::outLn("\t$file");
+            }
+            self::outLn("");
+        }
+
+        //
+        // Print modified files
+        //
+        if (count($modlist) > 0) {
+            self::outLn("Modified files:");
+            foreach ($modlist as $file) {
+                self::outLn("\t$file");
+            }
+            self::outLn("");
+        }
+
+        //
+        // Print URL list by author when gitdaily.logurl is define.
+        //
+        if (isset($this->config['logurl']) && count($revision_list) > 0) {
+            // Merge commit list by author
+            $author_list = array();
+            foreach ($revision_list as $revision) {
+                if (!isset($author_list[$revision['author']])) {
+                    $author_list[$revision['author']] = array();
+                }
+
+                // Add commit list
+                $author_list[$revision['author']][] = $revision['id'];
+            }
+
+            self::outLn("Author list:");
+            foreach ($author_list as $author => $id_list) {
+                self::outLn("= $author");
+                foreach ($id_list as $id) {
+                    $url = sprintf($this->config['logurl'], $id);
+                    self::outLn($url);
+                }
+                self::outLn("");
+            }
+        }
+    }
+
     public static function usage()
     {
         fwrite(STDERR, <<<E
 Usage: git daily release open        : Open daily-release process
+   or: git daily release list        : Show release list
    or: git daily release sync        : Sync current opened release process
    or: git daily release close       : Close to daily-release process
 
