@@ -407,7 +407,7 @@ class Git_Daily_Command_Release
 
 
         // return to develop
-        self::cmd(Git_Daily::$git, array('checkout', $master_branch));
+        self::cmd(Git_Daily::$git, array('checkout', $develop_branch));
         return 'release closed';
     }
 
