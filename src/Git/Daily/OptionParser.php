@@ -26,10 +26,10 @@ class Git_Daily_OptionParser
         $orig_options = $options;
         $normalize_argv = array();
         foreach ($argv as $arg) {
-            if (strpos($arg, '=')) {
-                list($key, $value) = explode('=', $arg);
-                $normalize_argv[] = $key;
-                $normalize_argv[] = $value;
+            if (strpos($arg, '=') && strpos($arg, '--') === 0) {
+                $arg_line = explode('=', $arg);
+                $normalize_argv[] = array_shift($arg_line);
+                $normalize_argv[] = implode('=', $arg_line);
             }
             else {
                 $normalize_argv[] = $arg;
@@ -41,6 +41,11 @@ class Git_Daily_OptionParser
             $arg = $argv[$i];
             if ($arg{0} == '-') {
                 $optdef_key = $this->_findDef($arg);
+                if (!$optdef_key) {
+                    throw new Git_Daily_Exception(
+                        "invalid option: {$arg}"
+                    );
+                }
                 $optdef = $this->options[$optdef_key];
                 if (!isset($optdef[2])) {
                     $optdef[2] = self::ACT_STORE_VAR;
