@@ -9,13 +9,14 @@ class Git_Daily_Command_Config
     const DESCRIPTION = 'Set or show config';
 
     protected $option = array(
-        'list' => array('l', 'list'),
+        //'list' => array('l', 'list', Git_Daily_OptionParser::ACT_STORE_TRUE),
     );
 
     private $_config_key_list = array(
         'remote',
         'develop',
         'master',
+        'logurl',
     );
 
     public function runCommand()
@@ -53,6 +54,9 @@ class Git_Daily_Command_Config
             break;
         case 'master':
             $this->_setConfigMaster($value);
+            break;
+        case 'logurl':
+            $this->_setConfigLogurl($value);
             break;
         default:
             throw new Git_Daily_Exception(
@@ -109,13 +113,32 @@ class Git_Daily_Command_Config
         self::outLn('config setted');
     }
 
+    private function _setConfigLogurl($value)
+    {
+        // TODO: something validation?
+        self::cmd(Git_Daily::$git, array('config', 'gitdaily.logurl', $value));
+        self::outLn('config setted');
+    }
+
     public static function usage()
     {
         fwrite(STDERR, <<<E
 Usage: git daily config <key> <value>
 
 Example:
-       git daily config remote origin
+
+    Remote name :
+        git daily config remote origin
+
+    Branch name of develop :
+        git daily config develop develop
+
+    Branch name of master :
+        git daily config master master
+
+    URL template for dump list (will dump commit hash instead of "%s") :
+        GitWeb :  git daily config logurl "http://example.com/?p=repositories/example.git;a=commit;h=%s"
+        GitHub :  git daily config logurl "https://github.com/sotarok/git-daily/commit/%s"
 
 E
         );
