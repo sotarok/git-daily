@@ -26,10 +26,9 @@ abstract class Git_Daily_CommandAbstract
             $config = new Git_Daily_Command_Config(array());
             $config_vars = $config->runCommand();
             foreach ($config_vars as $config_var) {
-                list ($key, $value) = explode('=', $config_var);
-                $key = str_replace('gitdaily.', '', $key);
-
-                $this->config[$key] =  $value;
+                $config_line = explode('=', $config_var);
+                $key = str_replace('gitdaily.', '', array_shift($config_line));
+                $this->config[$key] =  implode('=', $config_line);
             }
         }
     }
