@@ -72,7 +72,7 @@ class Git_Daily_Command_Release
         }
 
         // check if current release process opened
-        $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"), array('sed', array('s/*\?\s\+//g'))));
+        $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"), array('sed', array('s/^[^a-zA-Z0-9]+//g'))));
         if (!empty($release_branches)) {
             $release_branches = implode(',', $release_branches);
 
@@ -178,7 +178,7 @@ class Git_Daily_Command_Release
         $release_branch = false;
         $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
             array(
-                'sed', array('s/*\?\s\+//g'),
+                'sed', array('s/^[^a-zA-Z0-9]+//g'),
             )
         ));
         if (!empty($release_branches)) {
@@ -195,7 +195,7 @@ class Git_Daily_Command_Release
         $remote_release_branches = self::cmd(Git_Daily::$git, array('branch', '-a'),
             array('grep', array("remotes/$remote/release"),
                 array(
-                    'sed', array('s/*\?\s\+//g'),
+                    'sed', array('s/^[^a-zA-Z0-9]+//g'),
                 )
             )
         );
@@ -292,7 +292,7 @@ class Git_Daily_Command_Release
     {
         $release_branch = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
             array(
-                'sed', array('s/*\?\s\+//g'),
+                'sed', array('s/^[^a-zA-Z0-9]+//g'),
             )
         ));
         if (empty($release_branch)) {
@@ -302,7 +302,7 @@ class Git_Daily_Command_Release
 
         $master_branch = $this->config['master'];
         $develop_branch = $this->config['develop'];
-        $remote = $this->config['remote'];
+        $remote = isset($this->config['remote']) ? $this->config['remote'] : null;
 
         if (!empty($remote)) {
             self::info('first, fetch remotes');
@@ -416,7 +416,7 @@ class Git_Daily_Command_Release
     {
         $release_branch = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
             array(
-                'sed', array('s/*\?\s\+//g'),
+                'sed', array('s/^[^a-zA-Z0-9]+//g'),
             )
         ));
         if (empty($release_branch)) {
@@ -432,7 +432,7 @@ class Git_Daily_Command_Release
             self::info('first, fetch remotes');
             self::cmd(Git_Daily::$git, array('fetch', '--all'));
         }
-        
+
         //
         // Get revision list using git rev-list.
         //
