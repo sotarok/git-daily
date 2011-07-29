@@ -16,7 +16,7 @@ class Git_Daily_GitUtil
     {
         list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color'),
             array(
-                'sed', array('s/^[^a-zA-Z0-9]+//g'),
+                'sed', array('s/^[^a-zA-Z0-9]*//g'),
             )
         );
         return $res;
@@ -26,7 +26,7 @@ class Git_Daily_GitUtil
     {
         list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color', '--merged'),
             array(
-                'sed', array('s/^[^a-zA-Z0-9]+//g'),
+                'sed', array('s/^[^a-zA-Z0-9]*//g'),
             )
         );
         return $res;
