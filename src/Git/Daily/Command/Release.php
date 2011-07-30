@@ -72,7 +72,7 @@ class Git_Daily_Command_Release
         }
 
         // check if current release process opened
-        $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"), array('sed', array('s/^[^a-zA-Z0-9]*//g'))));
+        $release_branches = Git_Daily_GitUtil::releaseBranches();
         if (!empty($release_branches)) {
             $release_branches = implode(',', $release_branches);
 
@@ -176,11 +176,7 @@ class Git_Daily_Command_Release
 
         // if has local branch, try to checkout
         $release_branch = false;
-        $release_branches = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
-            array(
-                'sed', array('s/^[^a-zA-Z0-9]*//g'),
-            )
-        ));
+        $release_branches = Git_Daily_GitUtil::releaseBranches();
         if (!empty($release_branches)) {
             if (count($release_branches) == 1) {
                 $release_branch = array_shift($release_branches);
@@ -290,11 +286,7 @@ class Git_Daily_Command_Release
      */
     private function _doClose()
     {
-        $release_branch = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
-            array(
-                'sed', array('s/^[^a-zA-Z0-9]*//g'),
-            )
-        ));
+        $release_branches = Git_Daily_GitUtil::releaseBranches();
         if (empty($release_branch)) {
             throw new Git_Daily_Exception('release branch not found. abort.');
         }
@@ -414,11 +406,7 @@ class Git_Daily_Command_Release
 
     private function _doList()
     {
-        $release_branch = self::cmd(Git_Daily::$git, array('branch'), array('grep', array("release"),
-            array(
-                'sed', array('s/^[^a-zA-Z0-9]*//g'),
-            )
-        ));
+        $release_branch = Git_Daily_GitUtil::releaseBranches();
         if (empty($release_branch)) {
             throw new Git_Daily_Exception('release branch not found. abort.');
         }

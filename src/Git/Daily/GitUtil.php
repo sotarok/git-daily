@@ -32,6 +32,19 @@ class Git_Daily_GitUtil
         return $res;
     }
 
+    public static function releaseBranches()
+    {
+        list($release_branch, ) = Git_Daily_CommandUtil::cmd(
+            Git_Daily::$git, array('branch'),
+            array('grep', array("release/"),
+                array(
+                    'sed', array('s/^[^a-zA-Z0-9]*//g'),
+                )
+            )
+        );
+        return $release_branch;
+    }
+
     public static function hasBranch($branch)
     {
         $branches = self::branches();
@@ -84,5 +97,6 @@ class Git_Daily_GitUtil
             return null;
         }
     }
+
 }
 
