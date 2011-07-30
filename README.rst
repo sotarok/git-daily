@@ -88,6 +88,14 @@ Release
     git daily release close
 
 
+Contribution
+--------------------------
+
+Use `gitFlow <https://github.com/nvie/gitflow>`_ to develop git-daily.
+When you want to fix some bugs or implemente some new features,
+commit not to ``master`` branch but to ``develop`` branch.
+
+
 License
 --------------------------
 
