@@ -72,14 +72,14 @@ Release
 
     git daily release list
 
-  ** When gitdaily.logurl is define, git-daily shows author lists with
-     logurl. git-daily replaces %s in gitdaily.logurl to a commit id. 
+* When gitdaily.logurl is defined, git-daily shows author lists
+  with logurl. git-daily replaces %s in gitdaily.logurl to a commit id. ::
 
   [config]
   gitdaily.logurl = "http://github.com/user/git-daily/commit/%s"
   
   [output]
-  = userA
+  @userA:
   http://github.com/user/git-daily/commit/0123456789.....
   ...
 
