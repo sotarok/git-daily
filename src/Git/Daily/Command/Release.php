@@ -540,7 +540,7 @@ class Git_Daily_Command_Release
 
             self::outLn("Author list:");
             foreach ($author_list as $author => $id_list) {
-                self::outLn("\t$author:");
+                self::outLn("\t@$author:");
                 foreach ($id_list as $id) {
                     $url = sprintf("\t{$this->config['logurl']}", $id);
                     self::outLn($url);
