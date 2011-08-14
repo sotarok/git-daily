@@ -14,12 +14,15 @@ class Git_Daily
     const VERSION = '0.1.4';
     const COMMAND = 'git-daily';
 
+    const SUPPORTED_MIN_GIT_VERSION = '1.7.0';
+
     const USAGE_SPACE = 4;
 
     const E_GIT_NOT_FOUND           = 1;
     const E_GIT_STATUS_NOT_CLEAN    = 2;
     const E_GIT_PUSH_FAILED         = 3;
     const E_GIT_PULL_FAILED         = 4;
+    const E_GIT_VERSION_COMPAT      = 5;
 
     const E_NOT_IN_REPO             = 101;
     const E_NOT_INITIALIZED         = 102;
@@ -80,11 +83,25 @@ class Git_Daily
         }
         self::$git = $git_cmd;
 
+        // git version check
+        list($git_version, ) = Git_Daily_CommandUtil::cmd('git', array('version'));
+        if (preg_match('/((\d\.)+\d)/', trim($git_version[0]), $matches)) {
+            $git_version = $matches[1];
+        } else {
+            $git_version = 0;
+        }
+
+        if (version_compare($git_version, self::SUPPORTED_MIN_GIT_VERSION) < 0) {
+            throw new Git_Daily_Exception(
+                sprintf("git daily now supported at least version %s\nyour git version: %s", self::SUPPORTED_MIN_GIT_VERSION, $git_version),
+                self::E_GIT_VERSION_COMPAT, null, true
+            );
+        }
+
         if ($argc < 2) {
             throw new Git_Daily_Exception("no subcommand specified.",
                 self::E_SUBCOMMAND_NOT_FOUND, null, true, true
             );
-
         }
         $file = array_shift($argv);
         $subcommand = array_shift($argv);

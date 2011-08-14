@@ -17,6 +17,13 @@ Sub-commands are::
     git daily help
 
 
+Requirements
+--------------------------
+
+* Git: >= 1.7.0
+* PHP: >= 5.2.0
+
+
 Installation
 --------------------------
 
