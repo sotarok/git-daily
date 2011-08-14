@@ -69,6 +69,9 @@ class Git_Daily_Command_Init
                 self::cmd(Git_Daily::$git, array('checkout', $develop_branch));
             } else {
                 self::cmd(Git_Daily::$git, array('checkout', '-b', $develop_branch));
+                if (!empty($remote)) {
+                    self::cmd(Git_Daily::$git, array('push', $remote, $develop_branch));
+                }
             }
         }
 
