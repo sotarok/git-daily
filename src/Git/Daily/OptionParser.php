@@ -82,7 +82,7 @@ class Git_Daily_OptionParser
         }
 
         // register remain argv as args
-        $this->args = $argv;
+        $this->args = array_merge(array(), $argv);
     }
 
     private function _findDef($arg)
@@ -101,11 +101,11 @@ class Git_Daily_OptionParser
             return false;
         }
         if (strlen($arg) == 2 && $arg{0} == '-') {
-            foreach ($this->options as $opt) {
+            foreach ($this->options as $key => $opt) {
                 $def_opt = $opt[0];
                 $real_arg = substr($arg, 1);
                 if ($real_arg == $def_opt) {
-                    return $opt;
+                    return $key;
                 }
             }
 
