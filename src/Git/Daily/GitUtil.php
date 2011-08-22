@@ -54,7 +54,7 @@ class Git_Daily_GitUtil
     public static function hasRemoteBranch($remote, $branch)
     {
         $remote_branch = self::remoteBranch($remote, $branch);
-        if ($remote != null) {
+        if ($remote_branch != null) {
             return true;
         }
         return false;
