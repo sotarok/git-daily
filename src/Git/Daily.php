@@ -11,7 +11,7 @@ require_once 'Git/Daily/GitUtil.php';
 
 class Git_Daily
 {
-    const VERSION = '0.1.4';
+    const VERSION = '0.2.0-dev';
     const COMMAND = 'git-daily';
 
     const SUPPORTED_MIN_GIT_VERSION = '1.7.0';
