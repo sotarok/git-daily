@@ -76,12 +76,14 @@ class Git_Daily_GitUtilTest
 
     public function testHasBranch()
     {
+        chdir($this->dir);
         $this->assertTrue(Git_Daily_GitUtil::hasBranch('master'));
         $this->assertFalse(Git_Daily_GitUtil::hasBranch('hoge'));
     }
 
     public function testCurrentBranch()
     {
+        chdir($this->dir);
         $this->assertEquals('master', Git_Daily_GitUtil::currentBranch());
     }
 
