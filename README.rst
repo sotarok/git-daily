@@ -22,6 +22,7 @@ Requirements
 
 * Git: >= 1.7.0
 * PHP: >= 5.2.0
+* PHPUnit: >= 3.5.0 (for test)
 
 
 Installation
@@ -82,13 +83,13 @@ Release
 * When gitdaily.logurl is defined, git-daily shows author lists
   with logurl. git-daily replaces %s in gitdaily.logurl to a commit id. ::
 
-  [config]
-  gitdaily.logurl = "http://github.com/user/git-daily/commit/%s"
-  
-  [output]
-  @userA:
-  http://github.com/user/git-daily/commit/0123456789.....
-  ...
+    [config]
+    gitdaily.logurl = "http://github.com/user/git-daily/commit/%s"
+     
+    [output]
+    @userA:
+    http://github.com/user/git-daily/commit/0123456789.....
+    ...
 
 * To close daily release process, use ::
 
@@ -101,6 +102,14 @@ Contribution
 Use `gitFlow <https://github.com/nvie/gitflow>`_ to develop git-daily.
 When you want to fix some bugs or implemente some new features,
 commit not to ``master`` branch but to ``develop`` branch.
+
+
+Test
+^^^^^^
+
+phpunit.xml is loaded automatically ::
+
+    $ phpunit
 
 
 License
