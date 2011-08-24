@@ -13,6 +13,10 @@ Sub-commands are::
     git daily release list
     git daily release sync
     git daily release close
+    git daily hotfix  open
+    git daily hotfix  list
+    git daily hotfix  sync
+    git daily hotfix  close
     git daily version
     git daily help
 
@@ -93,6 +97,25 @@ Release
 * To close daily release process, use ::
 
     git daily release close
+
+Hotfix
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* To open the hotfix process of the day, use ::
+
+    git daily hotfix open
+
+* To sync opened or closed hotfix process, use ::
+
+    git daily hotfix sync
+
+* To show the release list, use::
+
+    git daily hotfix list
+
+* To close hotfix process, use ::
+
+    git daily hotfix close
 
 
 Contribution
