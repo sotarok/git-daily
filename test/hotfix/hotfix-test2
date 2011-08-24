@@ -1,0 +1,187 @@
+#! /bin/bash
+
+#
+# Test script for git daily hot fix
+# Scenario:
+#   1. git daily init
+#   2. git daily release open
+#   3. git daily hotfix open
+#   4. edit source code (2 developers)
+#   5. git daily hotfix sync
+#   6. git daily hotfix close
+#   7. git daily release close
+#
+# Verify:
+#   1. Verify that diffs are merged into the master branch.
+#   2. Verify that diffs are merged into the release branch.
+#   3. Verify that diffs are not merged into the develop branch when the hotfix branch is closed.
+#   4. Verify that diffs are not merged into the develop branch when the release branch is closed.
+#
+
+REPOS=gitdaily-test
+WORKING1=a
+WORKING2=b
+RESULT=`pwd`/`basename $0`-result
+EXPECTED=expected/`basename $0`-expected
+
+# prepare
+rm -f $RESULT
+mkdir $REPOS
+pushd $REPOS
+git init --bare
+popd
+
+# working on WORKING1
+mkdir $WORKING1
+pushd $WORKING1
+git clone ../$REPOS
+cat <<EOF >> $REPOS/.git/config
+[gitdaily]
+	remote = origin
+	master = master
+	develop = develop
+	init = true
+	logurl = http://localhost/aaa=%s
+EOF
+
+echo foo > $REPOS/foo.txt
+cd $REPOS
+git add --all
+git commit -a -m "add foo"
+git push origin master
+
+popd
+
+mkdir $WORKING2
+pushd $WORKING2
+git clone ../$REPOS
+cat <<EOF >> $REPOS/.git/config
+[gitdaily]
+	remote = origin
+	master = master
+	develop = develop
+	init = true
+	logurl = http://localhost/aaa=%s
+EOF
+popd
+
+
+# TEST!!
+
+# user1
+# release open
+pushd $WORKING1/$REPOS
+git checkout -b develop
+git push origin develop
+echo y | git daily release open
+git branch -a
+echo 1 > 1
+git add 1
+git commit -a -m "add 1"
+echo 2 > 2
+git add 2
+git commit -a -m "add 2"
+git daily release sync
+
+popd
+
+# user 2
+# hotfix open
+pushd $WORKING2/$REPOS
+git daily release sync
+git checkout master
+echo y | git daily hotfix open
+git branch -a
+echo 3 > 3
+git add 3
+git commit -a -m "add 3"
+echo 4 > 4
+git add 4
+git commit -a -m "add 4"
+git daily hotfix sync
+echo baz >> foo.txt
+git commit -a -m "baz"
+git daily hotfix sync
+git daily hotfix close
+popd
+
+#
+# Verify!!
+#
+pushd $WORKING2/$REPOS
+echo check the current branch after closing >> $RESULT
+echo git branch -a >> $RESULT
+git branch -a | tr '[0-9]' x >> $RESULT
+
+# check merge status on the develop branch
+echo check merge status on the develop branch >> $RESULT
+echo ls >> $RESULT
+ls >> $RESULT
+echo cat foo.txt >> $RESULT
+cat foo.txt >> $RESULT
+
+# checkout the master branch
+echo checkout the master branch >> $RESULT
+echo git checkout master >> $RESULT
+git checkout master >> $RESULT
+
+release=`git branch  | grep release | sed -e 's/\**\s\+//g'`
+echo checkout release >> $RESULT
+echo git checkout release >> $RESULT
+git checkout $release
+
+
+# check merge status on the master branch
+echo check merge status on the master branch >> $RESULT
+echo ls >> $RESULT
+ls >> $RESULT
+echo cat foo.txt >> $RESULT
+cat foo.txt >> $RESULT
+popd
+
+# user1
+pushd $WORKING1/$REPOS
+git daily release sync
+git daily release close
+
+#
+# Verify!!
+#
+
+# check the current branch after closing
+echo check the current branch after closing >> $RESULT
+echo git branch -a >> $RESULT
+git branch -a >> $RESULT
+
+# check merge status on the develop branch
+echo check merge status on the develop branch >> $RESULT
+echo ls >> $RESULT
+ls >> $RESULT
+echo cat foo.txt >> $RESULT
+cat foo.txt >> $RESULT
+
+# checkout the master branch
+echo checkout the master branch >> $RESULT
+echo git checkout master >> $RESULT
+git checkout master >> $RESULT
+
+# check merge status on the master branch
+echo check merge status on the master branch >> $RESULT
+echo ls >> $RESULT
+ls >> $RESULT
+echo cat foo.txt >> $RESULT
+cat foo.txt >> $RESULT
+popd
+
+# teardown
+rm -rf $REPOS
+rm -rf $WORKING1
+rm -rf $WORKING2
+
+
+diff -u $EXPECTED $RESULT
+if [ $? -ne 0 ]; then
+    echo "git daily release: FAILED"
+else
+    echo "git daily release: PASS"
+fi

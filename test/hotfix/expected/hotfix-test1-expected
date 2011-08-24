@@ -1,0 +1,30 @@
+check the current branch after closing
+git branch -a
+  develop
+* master
+  remotes/origin/develop
+  remotes/origin/master
+check merge status on the develop branch
+ls
+1
+2
+3
+4
+foo.txt
+cat foo.txt
+foo
+bar
+baz
+checkout the master branch
+git checkout master
+check merge status on the master branch
+ls
+1
+2
+3
+4
+foo.txt
+cat foo.txt
+foo
+bar
+baz
