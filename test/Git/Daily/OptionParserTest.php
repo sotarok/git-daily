@@ -85,10 +85,73 @@ class Git_Daily_OptionParserTest
                 "-b hoge --test=arg1 aoi",
                 array(
                     'base' => array('b', 'base', Git_Daily_OptionParser::ACT_STORE_VAR),
-                    'test' => array(null,'test', Git_Daily_OptionParser::ACT_STORE_VAR)
+                    'test' => array(null,'test') // default is ACT_STORE_VAR
                 ),
                 'test', 'arg1', array('aoi')
             ),
+            array( // option is not a type of OptionParser
+                "-b hoge",
+                array(
+                    'base' => array('b', 'base', 999),
+                ),
+                'base', '', array('-b', 'hoge')
+            ),
         );
+    }
+
+    /**
+     * @expectedException Git_Daily_Exception
+     * @expectedExceptionMessage invalid option
+     */
+    public function testInvalidOptions()
+    {
+        $argv = array('-b', 'hoge');
+        $option = array(
+            'test' => array(null,'test', Git_Daily_OptionParser::ACT_STORE_VAR)
+        );
+
+        $opt = new Git_Daily_OptionParser($argv, $option);
+    }
+
+    /**
+     * @expectedException Git_Daily_Exception
+     * @expectedExceptionMessage invalid option
+     */
+    public function testInvalidLongOptions()
+    {
+        $argv = array('--base', 'hoge');
+        $option = array(
+            'test' => array(null,'test', Git_Daily_OptionParser::ACT_STORE_VAR)
+        );
+
+        $opt = new Git_Daily_OptionParser($argv, $option);
+    }
+
+    /**
+     * @expectedException Git_Daily_Exception
+     * @expectedExceptionMessage invalid option
+     */
+    public function testInvalidOptionFormats()
+    {
+        $argv = array('-', 'hoge');
+        $option = array(
+            'test' => array(null,'test', Git_Daily_OptionParser::ACT_STORE_VAR)
+        );
+
+        $opt = new Git_Daily_OptionParser($argv, $option);
+    }
+
+    /**
+     * @expectedException Git_Daily_Exception
+     * @expectedExceptionMessage argument -b required a value
+     */
+    public function testInvalidArgs()
+    {
+        $argv = array('-b',);
+        $option = array(
+            'base' => array('b', 'base', Git_Daily_OptionParser::ACT_STORE_VAR)
+        );
+
+        $opt = new Git_Daily_OptionParser($argv, $option);
     }
 }
