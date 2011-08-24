@@ -71,7 +71,7 @@ class Git_Daily_GitUtilTest
     public function testReleaseBranches()
     {
         chdir($this->dir);
-        $this->assertEquals(array(), Git_Daily_GitUtil::releaseBranches());
+        $this->assertEquals(array(), Git_Daily_GitUtil::releaseBranches('release'));
     }
 
     public function testHasBranch()
