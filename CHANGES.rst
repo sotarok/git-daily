@@ -5,8 +5,14 @@ Changes
 0.2.0 (working)
 ----------------------
 
-* added tests.
+Features
+^^^^^^^^^^^^
+* Hotfix feature
+* Added tests
 
+Notes
+^^^^^^^^^^^^
+* Output changed from STDOUT to STDERR (Breaking B.C.)
 
 0.1.4
 ----------------------
