@@ -1,0 +1,21 @@
+<phpunit
+  backupGlobals="true"
+  backupStaticAttributes="false"
+  bootstrap="test/bootstrap.php"
+  colors="true"
+  forceCoversAnnotation="false"
+  convertErrorsToExceptions="true"
+  convertNoticesToExceptions="true"
+  convertWarningsToExceptions="true"
+  stopOnError="false"
+  stopOnFailure="false"
+  stopOnIncomplete="false"
+  stopOnSkipped="false"
+  >
+  <testsuites>
+    <testsuite name="Git_Daily">
+      <directory suffix="Test.php">test</directory>
+      <exclude>src</exclude>
+    </testsuite>
+  </testsuites>
+</phpunit>
