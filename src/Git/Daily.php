@@ -3,11 +3,11 @@
  *
  */
 
-require_once 'Git/Daily/Exception.php';
-require_once 'Git/Daily/CommandUtil.php';
-require_once 'Git/Daily/CommandAbstract.php';
-require_once 'Git/Daily/OptionParser.php';
-require_once 'Git/Daily/GitUtil.php';
+require_once dirname(__FILE__) . '/Daily/Exception.php';
+require_once dirname(__FILE__) . '/Daily/CommandUtil.php';
+require_once dirname(__FILE__) . '/Daily/CommandAbstract.php';
+require_once dirname(__FILE__) . '/Daily/OptionParser.php';
+require_once dirname(__FILE__) . '/Daily/GitUtil.php';
 
 class Git_Daily
 {
