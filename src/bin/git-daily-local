@@ -14,6 +14,8 @@ E;
     exit;
 }
 
+set_include_path(dirname(__DIR__) . PATH_SEPARATOR . get_include_path());
+
 ini_set('max_execution_time', 0);
 ini_set('memory_limit', -1);
 
