@@ -324,7 +324,7 @@ class Git_Daily_Command_Release
             );
             $merge_branch = array_shift($merge_branches);
             $remote = $this->config['remote'];
-            
+
             if (empty($merge_branch)) {
                 continue;
             }
@@ -333,7 +333,7 @@ class Git_Daily_Command_Release
                 self::info('first, fetch remotes');
                 self::cmd(Git_Daily::$git, array('fetch', '--all'));
                 self::info('diff check');
-                
+
                 $diff_branch_str1 = "{$release_branch}..{$remote}/{$release_branch}";
                 $diff_branch_str2 = "{$remote}/{$release_branch}..{$release_branch}";
                 $res1 = self::cmd(Git_Daily::$git, array('diff', $diff_branch_str1));
@@ -355,7 +355,7 @@ class Git_Daily_Command_Release
                     throw new Git_Daily_Exception('abort');
                 }
             }
-           
+
             // merged check
             $res = Git_Daily_GitUtil::mergedBranches();
             if (!in_array($release_branch, $res)) {
@@ -420,7 +420,7 @@ class Git_Daily_Command_Release
             self::info('first, fetch remotes');
             self::cmd(Git_Daily::$git, array('fetch', '--all'));
         }
-        
+
         //
         // Get revision list using git rev-list.
         //
