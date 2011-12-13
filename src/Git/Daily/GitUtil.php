@@ -16,7 +16,7 @@ class Git_Daily_GitUtil
     {
         list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color'),
             array(
-                'sed', array('s/*\?\s\+//g'),
+                'sed', array('s/^[^a-zA-Z0-9]*//g'),
             )
         );
         return $res;
@@ -26,10 +26,23 @@ class Git_Daily_GitUtil
     {
         list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color', '--merged'),
             array(
-                'sed', array('s/*\?\s\+//g'),
+                'sed', array('s/^[^a-zA-Z0-9]*//g'),
             )
         );
         return $res;
+    }
+
+    public static function releaseBranches($branch)
+    {
+        list($release_branch, ) = Git_Daily_CommandUtil::cmd(
+            Git_Daily::$git, array('branch'),
+            array('grep', array("{$branch}/"),
+                array(
+                    'sed', array('s/^[^a-zA-Z0-9]*//g'),
+                )
+            )
+        );
+        return $release_branch;
     }
 
     public static function hasBranch($branch)
@@ -41,7 +54,7 @@ class Git_Daily_GitUtil
     public static function hasRemoteBranch($remote, $branch)
     {
         $remote_branch = self::remoteBranch($remote, $branch);
-        if ($remote != null) {
+        if ($remote_branch != null) {
             return true;
         }
         return false;
@@ -84,5 +97,6 @@ class Git_Daily_GitUtil
             return null;
         }
     }
+
 }
 

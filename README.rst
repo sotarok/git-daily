@@ -13,8 +13,20 @@ Sub-commands are::
     git daily release list
     git daily release sync
     git daily release close
+    git daily hotfix  open
+    git daily hotfix  list
+    git daily hotfix  sync
+    git daily hotfix  close
     git daily version
     git daily help
+
+
+Requirements
+--------------------------
+
+* Git: >= 1.7.0
+* PHP: >= 5.2.0
+* PHPUnit: >= 3.5.0 (for test)
 
 
 Installation
@@ -72,46 +84,90 @@ Release
 
     git daily release list
 
-  ** When gitdaily.logurl is define, git-daily shows author lists with
-     logurl. git-daily replaces %s in gitdaily.logurl to a commit id. 
+* When gitdaily.logurl is defined, git-daily shows author lists
+  with logurl. git-daily replaces %s in gitdaily.logurl to a commit id. ::
 
-  [config]
-  gitdaily.logurl = "http://github.com/user/git-daily/commit/%s"
-  
-  [output]
-  = userA
-  http://github.com/user/git-daily/commit/0123456789.....
-  ...
+    [config]
+    gitdaily.logurl = "http://github.com/user/git-daily/commit/%s"
+
+    [output]
+    @userA:
+    http://github.com/user/git-daily/commit/0123456789.....
+    ...
 
 * To close daily release process, use ::
 
     git daily release close
 
+Hotfix
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* To open the hotfix process of the day, use ::
+
+    git daily hotfix open
+
+* To sync opened or closed hotfix process, use ::
+
+    git daily hotfix sync
+
+* To show the release list, use::
+
+    git daily hotfix list
+
+* To close hotfix process, use ::
+
+    git daily hotfix close
+
+
+Contribution
+-------------
+
+Use `gitFlow <https://github.com/nvie/gitflow>`_ to develop git-daily.
+When you want to fix some bugs or implemente some new features,
+commit not to ``master`` branch but to ``develop`` branch.
+
+
+Test
+^^^^^^
+
+phpunit.xml is loaded automatically ::
+
+    $ phpunit
+
+
+Links
+-------
+
+References here (Japanese Only).
+
+* http://speakerdeck.com/u/sotarok/p/git-daily-a-tool-supports-a-daily-workflow-with-remote
+* http://d.hatena.ne.jp/sotarok/20111015/pyfes_git_daily
+
 
 License
---------------------------
+---------
 
 ::
 
      The BSD License
-     
+
      Copyright (c) 2011, Sotaro Karasawa
      All rights reserved.
-     
+
      Redistribution and use in source and binary forms, with or without
      modification, are permitted provided that the following conditions
      are met:
-     
+
        - Redistributions of source code must retain the above copyright
-         notice, this list of conditions and the following disclaimer. 
+         notice, this list of conditions and the following disclaimer.
        - Redistributions in binary form must reproduce the above
          copyright notice, this list of conditions and the following
          disclaimer in the documentation and/or other materials provided
-         with the distribution. 
+         with the distribution.
        - Neither the name of the author nor the names of its contributors
          may be used to endorse or promote products derived from this
-         software without specific prior written permission. 
-     
+         software without specific prior written permission.
+
      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
      "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
      LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -123,6 +179,4 @@ License
      THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
 
