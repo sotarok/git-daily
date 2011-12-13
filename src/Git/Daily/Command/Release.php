@@ -17,6 +17,7 @@ class Git_Daily_Command_Release
     protected $load_config = true;
 
     protected $option = array(
+        'yes' => array('y', null, Git_Daily_OptionParser::ACT_STORE_TRUE),
     );
 
     protected $base_branch = 'develop';
@@ -118,10 +119,14 @@ class Git_Daily_Command_Release
             }
         }
 
+        $y = $this->opt->getOptVar('yes');
         $new_release_branch = $this->branch_prefix . '/' . date('Ymd-Hi');
         // confirmation
-        if (!Git_Daily_CommandUtil::yesNo("Confirm: create branch $new_release_branch from $current_branch ?",
-            Git_Daily_CommandUtil::YESNO_NO)) {
+        if (!$y
+            && !Git_Daily_CommandUtil::yesNo(
+                "Confirm: create branch $new_release_branch from $current_branch ?", Git_Daily_CommandUtil::YESNO_NO
+            )
+        ) {
             throw new Git_Daily_Exception('abort');
         }
 
