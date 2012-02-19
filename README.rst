@@ -26,7 +26,6 @@ Requirements
 
 * Git: >= 1.7.0
 * PHP: >= 5.2.0
-* PHPUnit: >= 3.5.0 (for test)
 
 
 Installation
