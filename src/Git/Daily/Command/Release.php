@@ -422,10 +422,10 @@ class Git_Daily_Command_Release
         }
 
         //
-        // Get revision list using git rev-list.
+        // Get revision list using git rev-list with --no-merges.
         //
         $revision_list = array();
-        $revision_id_list = self::cmd(Git_Daily::$git, array('rev-list', "$master_branch..$current_branch"));
+        $revision_id_list = self::cmd(Git_Daily::$git, array('rev-list', '--no-merges', "$master_branch..$current_branch"));
         foreach ($revision_id_list as $rev_id) {
             //
             // Get the detail of a revision using git show.
@@ -441,11 +441,8 @@ class Git_Daily_Command_Release
             //
             // Parse output of git show.
             //
-            $merge = false;
             foreach ($logs as $line) {
-                if (preg_match("/^Merge: /", $line)) {
-                    $merge = true;
-                } elseif (preg_match("/^Author: .+\<([^@]+)@([^>]+)>/", $line, $matches)) {
+                if (preg_match("/^Author: .+\<([^@]+)@([^>]+)>/", $line, $matches)) {
                     $revision['author'] = $matches[1];
                 } elseif (preg_match("/^diff --git a\/([^ ]+) /", $line, $matches)) {
                     $file = $matches[1];
@@ -456,12 +453,7 @@ class Git_Daily_Command_Release
                 }
             }
 
-            //
-            // Skip a merge log.
-            //
-            if (!$merge) {
-                $revision_list[] = $revision;
-            }
+            $revision_list[] = $revision;
         }
 
         //
