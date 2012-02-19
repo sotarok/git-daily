@@ -17,6 +17,7 @@ class Git_Daily_Command_Release
     protected $load_config = true;
 
     protected $option = array(
+        'yes' => array('y', null, Git_Daily_OptionParser::ACT_STORE_TRUE),
     );
 
     protected $base_branch = 'develop';
@@ -118,10 +119,14 @@ class Git_Daily_Command_Release
             }
         }
 
+        $y = $this->opt->getOptVar('yes');
         $new_release_branch = $this->branch_prefix . '/' . date('Ymd-Hi');
         // confirmation
-        if (!Git_Daily_CommandUtil::yesNo("Confirm: create branch $new_release_branch from $current_branch ?",
-            Git_Daily_CommandUtil::YESNO_NO)) {
+        if (!$y
+            && !Git_Daily_CommandUtil::yesNo(
+                "Confirm: create branch $new_release_branch from $current_branch ?", Git_Daily_CommandUtil::YESNO_NO
+            )
+        ) {
             throw new Git_Daily_Exception('abort');
         }
 
@@ -319,7 +324,7 @@ class Git_Daily_Command_Release
             );
             $merge_branch = array_shift($merge_branches);
             $remote = $this->config['remote'];
-            
+
             if (empty($merge_branch)) {
                 continue;
             }
@@ -328,7 +333,7 @@ class Git_Daily_Command_Release
                 self::info('first, fetch remotes');
                 self::cmd(Git_Daily::$git, array('fetch', '--all'));
                 self::info('diff check');
-                
+
                 $diff_branch_str1 = "{$release_branch}..{$remote}/{$release_branch}";
                 $diff_branch_str2 = "{$remote}/{$release_branch}..{$release_branch}";
                 $res1 = self::cmd(Git_Daily::$git, array('diff', $diff_branch_str1));
@@ -350,7 +355,7 @@ class Git_Daily_Command_Release
                     throw new Git_Daily_Exception('abort');
                 }
             }
-           
+
             // merged check
             $res = Git_Daily_GitUtil::mergedBranches();
             if (!in_array($release_branch, $res)) {
@@ -415,12 +420,12 @@ class Git_Daily_Command_Release
             self::info('first, fetch remotes');
             self::cmd(Git_Daily::$git, array('fetch', '--all'));
         }
-        
+
         //
-        // Get revision list using git rev-list.
+        // Get revision list using git rev-list with --no-merges.
         //
         $revision_list = array();
-        $revision_id_list = self::cmd(Git_Daily::$git, array('rev-list', "$master_branch..$current_branch"));
+        $revision_id_list = self::cmd(Git_Daily::$git, array('rev-list', '--no-merges', "$master_branch..$current_branch"));
         foreach ($revision_id_list as $rev_id) {
             //
             // Get the detail of a revision using git show.
@@ -436,11 +441,8 @@ class Git_Daily_Command_Release
             //
             // Parse output of git show.
             //
-            $merge = false;
             foreach ($logs as $line) {
-                if (preg_match("/^Merge: /", $line)) {
-                    $merge = true;
-                } elseif (preg_match("/^Author: .+\<([^@]+)@([^>]+)>/", $line, $matches)) {
+                if (preg_match("/^Author: .+\<([^@]+)@([^>]+)>/", $line, $matches)) {
                     $revision['author'] = $matches[1];
                 } elseif (preg_match("/^diff --git a\/([^ ]+) /", $line, $matches)) {
                     $file = $matches[1];
@@ -451,12 +453,7 @@ class Git_Daily_Command_Release
                 }
             }
 
-            //
-            // Skip a merge log.
-            //
-            if (!$merge) {
-                $revision_list[] = $revision;
-            }
+            $revision_list[] = $revision;
         }
 
         //

@@ -26,7 +26,6 @@ Requirements
 
 * Git: >= 1.7.0
 * PHP: >= 5.2.0
-* PHPUnit: >= 3.5.0 (for test)
 
 
 Installation
@@ -130,7 +129,12 @@ commit not to ``master`` branch but to ``develop`` branch.
 Test
 ^^^^^^
 
-phpunit.xml is loaded automatically ::
+* PHPUnit >= 3.5
+* PHP_Coverage >= 1.1.0
+
+
+Copy phpunix.xml.dist to phpunit.xml and modify configurations if you need.
+Run command ```phpunit``` and then phpunit.xml is loaded automatically ::
 
     $ phpunit
 
@@ -151,7 +155,7 @@ License
 
      The BSD License
 
-     Copyright (c) 2011, Sotaro Karasawa
+     Copyright (c) 2011-2012, Sotaro Karasawa
      All rights reserved.
 
      Redistribution and use in source and binary forms, with or without

@@ -1,1 +1,4 @@
+src/bin/git-daily-local
 tmp/
+build/
+phpunit.xml
