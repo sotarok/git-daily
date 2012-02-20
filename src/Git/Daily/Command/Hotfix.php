@@ -4,7 +4,6 @@
  *  @author     Sotaro Karasawa <sotaro.k@gmail.com>
  */
 
-require 'Git/Daily/Command/Release.php';
 
 /**
  *  Git_Daily_Command_Release

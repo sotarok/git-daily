@@ -3,11 +3,6 @@
  *
  */
 
-require_once dirname(__FILE__) . '/Daily/Exception.php';
-require_once dirname(__FILE__) . '/Daily/CommandUtil.php';
-require_once dirname(__FILE__) . '/Daily/CommandAbstract.php';
-require_once dirname(__FILE__) . '/Daily/OptionParser.php';
-require_once dirname(__FILE__) . '/Daily/GitUtil.php';
 
 class Git_Daily
 {

@@ -3,8 +3,6 @@
  *
  */
 
-require_once 'Git/Daily/Command/Config.php';
-
 abstract class Git_Daily_CommandAbstract
 {
     //protected $args = array();
