@@ -3,7 +3,6 @@
  *
  */
 
-require_once GIT_DAILY_SRC_DIR . '/Git/Daily/OptionParser.php';
 
 class Git_Daily_OptionParserTest
     extends PHPUnit_Framework_TestCase
@@ -14,7 +13,6 @@ class Git_Daily_OptionParserTest
     public function testOptVar($arg_str, $option, $key, $expected, $args)
     {
         $argv = explode(' ', $arg_str);
-        //var_dump($argv);
         $opt = new Git_Daily_OptionParser($argv, $option);
         $this->assertEquals($expected, $opt->getOptVar($key));
         $this->assertEquals($args, $opt->getArgs());
@@ -22,7 +20,6 @@ class Git_Daily_OptionParserTest
 
     public function optVarProvider()
     {
-        //'rebase' => array(null, 'rebase', Git_Daily_OptionParser::ACT_STORE_TRUE),
         return array(
             array( // longopt store true
                 "--rebase",
