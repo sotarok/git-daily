@@ -10,6 +10,13 @@ class Git_Daily_ClassLoaderTest
 {
     /**
      */
+    public function testGetSrcPath()
+    {
+        $this->assertEquals(realpath(GIT_DAILY_SRC_DIR), realpath(Git_Daily_ClassLoader::getSrcPath()));
+    }
+
+    /**
+     */
     public function testClassLoader()
     {
         $prefix = 'Git';

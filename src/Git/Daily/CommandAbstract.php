@@ -4,25 +4,31 @@
  */
 
 abstract class Git_Daily_CommandAbstract
+    implements Git_Daily_CommandInterface
 {
-    //protected $args = array();
-    protected $option = array();
-
-    protected $opt = null;
-
     public static $last_command_result;
     public static $last_command_retval;
 
-    protected $load_config = false;
-    protected $config = array();
+    protected $daily = null;
+    protected $cmd = null;
+    protected $output = null;
 
-    public function __construct($args)
-    {
-        $this->opt = new Git_Daily_OptionParser($args, $this->option);
+    protected $load_config = false;
+
+    public function __construct(
+        Git_Daily $daily,
+        $args,
+        Git_Daily_OutputInterface $output,
+        Git_Daily_CommandUtil $cmd
+    ) {
+        $this->daily = $daily;
+        $this->output = $output;
+        $this->cmd = $cmd;
+        $this->opt = new Git_Daily_OptionParser($args, $this->getOptions());
 
         if ($this->load_config) {
-            $config = new Git_Daily_Command_Config(array());
-            $config_vars = $config->runCommand();
+            $config = new Git_Daily_Command_Config(array(), $output, $cmd);
+            $config_vars = $config->execute();
             foreach ($config_vars as $config_var) {
                 $config_line = explode('=', $config_var);
                 $key = str_replace('gitdaily.', '', array_shift($config_line));
@@ -31,81 +37,32 @@ abstract class Git_Daily_CommandAbstract
         }
     }
 
-    public static function warn($msg)
+    public function createCommand($class_name, $args = array())
     {
-        self::out("[41;37m");
-        self::out('[WARNING] ' . $msg);
-        self::out("[0m");
-        self::out(PHP_EOL);
+        return new $class_name($this->daily, $args, $this->output, $this->cmd);
     }
 
-    public static function info($msg)
+    public function cmd($cmd, $options, array $pipe = array())
     {
-        self::out("[36m");
-        self::out('[INFO] ' . $msg);
-        self::out("[0m");
-        self::out(PHP_EOL);
-    }
-
-    public static function outLn()
-    {
-        $args = func_get_args();
-        call_user_func_array(array('self', 'out'), $args);
-        self::out(PHP_EOL);
-    }
-
-    public static function out()
-    {
-        if (func_num_args() < 1) {
-            return;
-        }
-        elseif (func_num_args() == 1) {
-            $args = func_get_args();
-            $arg = $args[0];
-            if (is_array($arg)) {
-                $string = '';
-                foreach ($arg as $str) {
-                    $string .= $str . PHP_EOL;
-                }
-                $string = trim($string);
-            }
-            else {
-                $string = $args[0];
-            }
-        }
-        else {
-            $args = func_get_args();
-            if (count($args) - 1 != preg_match_all('/%/', $args[0], $m)) {
-                $string = '';
-                foreach ($args as $str) {
-                    $string .= $str . PHP_EOL;
-                }
-                $string = trim($string);
-            }
-            else {
-                $format = array_shift($args);
-                $string = vsprintf($format, $args);
-            }
-        }
-        fwrite(STDOUT, $string);
-    }
-
-    public static function cmd($cmd, $options, array $pipe = array())
-    {
-        list($ret, $retval) = Git_Daily_CommandUtil::cmd($cmd, $options, $pipe);
+        list($ret, $retval) = $this->cmd->run($cmd, $options, $pipe);
         self::$last_command_result = $ret;
         self::$last_command_retval = $retval;
 
         return $ret;
     }
 
-    public static function runSubCommand($subcommand, $argv = array())
+    public function isAllowedOutOfRepo()
     {
-        $command = Git_Daily::getSubCommand($subcommand);
-        $command_class = new $command($argv);
-        return $command_class->runCommand();
+        return false;
     }
 
-    abstract public function runCommand();
+    public function getSubCommands()
+    {
+        return array();
+    }
 
+    public function usage()
+    {
+        return '';
+    }
 }

@@ -12,13 +12,8 @@
 class Git_Daily_Command_Release
     extends Git_Daily_CommandAbstract
 {
-    const DESCRIPTION = 'Operation daily release';
 
     protected $load_config = true;
-
-    protected $option = array(
-        'yes' => array('y', null, Git_Daily_OptionParser::ACT_STORE_TRUE),
-    );
 
     protected $base_branch = 'develop';
 
@@ -27,9 +22,27 @@ class Git_Daily_Command_Release
     protected $branch_prefix = 'release';
 
     /**
+     * {@inheritDoc}
+     */
+    public function getOptions()
+    {
+        return array(
+            'yes' => array('y', null, Git_Daily_OptionParser::ACT_STORE_TRUE),
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDescription()
+    {
+        return 'Operation daily release';
+    }
+
+    /**
      *  runCommand
      */
-    public function runCommand()
+    public function execute()
     {
         $is_clean = Git_Daily_GitUtil::isClean();
         if (!$is_clean) {
@@ -530,16 +543,15 @@ class Git_Daily_Command_Release
         }
     }
 
-    public static function usage()
+    public function usage()
     {
-        fwrite(STDERR, <<<E
+        return<<<E
 Usage: git daily release open        : Open daily-release process
    or: git daily release list        : Show release list
    or: git daily release sync        : Sync current opened release process
    or: git daily release close       : Close to daily-release process
 
-E
-        );
+E;
     }
 }
 

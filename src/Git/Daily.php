@@ -6,7 +6,7 @@
 
 class Git_Daily
 {
-    const VERSION = '0.1.6';
+    const VERSION = '0.2.0-dev';
     const COMMAND = 'git-daily';
 
     const SUPPORTED_MIN_GIT_VERSION = '1.7.0';
@@ -28,58 +28,50 @@ class Git_Daily
     const E_INVALID_ARGS            = 203;
     const E_RELEASE_CANNOT_OPEN     = 204;
 
+    const E_ERROR                   = 255;
+
     public static $git = null;
 
-    public static $allow_out_of_repo = array(
-        'help',
-        'version',
-    );
+    private $git_dir = null;
 
-    public static function getSubCommand($name)
+    public function __construct(Git_Daily_CommandUtil $cmd)
     {
-        $name = strtolower($name);
-        $name_case = ucfirst(strtolower($name));
-        $file = dirname(__FILE__) . '/Daily/Command/' . $name_case . '.php';
-        if (file_exists($file)) {
-            require_once $file;
-            $class = __CLASS__ . '_Command_' . $name_case;
-            if (class_exists($class, false)) {
-                return $class;
+        if (getenv('GIT_DAILY_GITBIN')) {
+            self::$git = getenv('GIT_DAILY_GITBIN');
+        } else {
+            list($git_cmd,) = $cmd->run('which', array('git'));
+            if (empty($git_cmd) || !is_executable($git_cmd = array_shift($git_cmd))) {
+                throw new Git_Daily_Exception("git command not found",
+                    self::E_GIT_NOT_FOUND, null, true
+                );
             }
+            self::$git = $git_cmd;
         }
 
-        throw new Git_Daily_Exception(
-            "no such subcommand: $name",
-            self::E_SUBCOMMAND_NOT_FOUND
-        );
+        $this->cmd= $cmd;
+
+        $this->checkGitVersion();
+        $this->findGitDir();
+        $this->registerCommands();
     }
 
-    public static function getSubCommandList()
+    private function findGitDir()
     {
-        $file_list = dirname(__FILE__) . '/Daily/Command/*.php';
-
-        $command_list = array();
-        foreach (glob($file_list) as $file) {
-            if (preg_match(sprintf('@^%s/Daily/Command/(\w+)\.php$@', dirname(__FILE__)), $file , $m)) {
-                $command_list[] = strtolower($m[1]);
-            }
+        list($git_dir, $retval) = $this->cmd->run(self::$git, array('rev-parse', '--git-dir'));
+        if ($retval == 0) {
+            $this->git_dir = $git_dir;
         }
-        return $command_list;
     }
 
-    public static function run($argc, $argv)
+    public function getGitDir()
     {
-        list($git_cmd,) = Git_Daily_CommandUtil::cmd('which', array('git'));
-        $git_cmd = array_shift($git_cmd);
-        if (!is_executable($git_cmd)) {
-            throw new Git_Daily_Exception("git command not found",
-                self::E_GIT_NOT_FOUND, null, true
-            );
-        }
-        self::$git = $git_cmd;
+        return $this->git_dir;
+    }
 
+    private function checkGitVersion()
+    {
         // git version check
-        list($git_version, ) = Git_Daily_CommandUtil::cmd('git', array('version'));
+        list($git_version, ) = $this->cmd->run(self::$git, array('version'));
         if (preg_match('/((\d\.)+\d)/', trim($git_version[0]), $matches)) {
             $git_version = $matches[1];
         } else {
@@ -92,42 +84,82 @@ class Git_Daily
                 self::E_GIT_VERSION_COMPAT, null, true
             );
         }
+    }
 
-        if ($argc < 2) {
-            throw new Git_Daily_Exception("no subcommand specified.",
-                self::E_SUBCOMMAND_NOT_FOUND, null, true, true
-            );
+    public function registerCommand($name, $class)
+    {
+        $this->commands[$name] = $class;
+    }
+
+    public function registerCommands()
+    {
+        $this->commands = array(
+            'version' => 'Git_Daily_Command_Version',
+            'init'  => 'Git_Daily_Command_Init',
+            'config'  => 'Git_Daily_Command_Config',
+            'help'    => 'Git_Daily_Command_Help',
+        );
+    }
+
+    public function findCommands()
+    {
+        return $this->commands;
+    }
+
+    public function findCommand($name)
+    {
+        if (isset($this->commands[$name])) {
+            return $this->commands[$name];
         }
-        $file = array_shift($argv);
-        $subcommand = array_shift($argv);
 
-        if (!in_array($subcommand, self::$allow_out_of_repo)) {
-            list($git_dir, $retval) = Git_Daily_CommandUtil::cmd(self::$git, array('rev-parse', '--git-dir'));
-            if ($retval != 0) {
+        return false;
+    }
+
+    public function run($args, Git_Daily_OutputInterface $output)
+    {
+        try {
+            $file = array_shift($args);
+            if (count($args) < 1) {
+                throw new Git_Daily_Exception("no subcommand specified.",
+                    self::E_SUBCOMMAND_NOT_FOUND, null, true, true
+                );
+            }
+
+            if (!($cmd_class = $this->findCommand($subcommand = array_shift($args)))) {
+                throw new Git_Daily_Exception(
+                    "no such subcommand: $name",
+                    self::E_SUBCOMMAND_NOT_FOUND
+                );
+            }
+
+            $cmd = new $cmd_class($this, $args, $output, $this->cmd);
+
+            if (!$this->getGitDir() && !$cmd->isAllowedOutOfRepo()) {
                 throw new Git_Daily_Exception("not in git repository",
                     self::E_NOT_IN_REPO, null, true
                 );
             }
-        }
 
-        try {
-            $result = Git_Daily_CommandAbstract::runSubCommand($subcommand, $argv);
+            $result = $cmd->execute();
             if ($result !== null) {
                 if (!is_array($result)) {
                     $result = array($result);
                 }
-                call_user_func_array('Git_Daily_CommandAbstract::outLn', $result);
+                call_user_func_array(array($output, 'outLn'), $result);
             }
+
+            return 0;
         } catch (Git_Daily_Exception $e) {
             if (!$e->isShowUsage()) {
-                fwrite(STDERR, self::COMMAND . ': fatal: ' .  $e->getMessage() . PHP_EOL);
+                $output->warn("%s: fatal: %s", self::COMMAND, $e->getMessage());
             }
-            exit($e->getCode());
+            return $e->getCode();
         }
     }
 
     public static function usage($subcommand = null, $only_subcommand = false)
     {
+        // DEPRECATED
         if ($subcommand === null && !$only_subcommand) {
             fwrite(STDERR, <<<E
 git-daily:

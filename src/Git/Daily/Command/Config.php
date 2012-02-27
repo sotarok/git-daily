@@ -6,12 +6,6 @@
 class Git_Daily_Command_Config
     extends Git_Daily_CommandAbstract
 {
-    const DESCRIPTION = 'Set or show config';
-
-    protected $option = array(
-        //'list' => array('l', 'list', Git_Daily_OptionParser::ACT_STORE_TRUE),
-    );
-
     private $_config_key_list = array(
         'remote',
         'develop',
@@ -19,7 +13,23 @@ class Git_Daily_Command_Config
         'logurl',
     );
 
-    public function runCommand()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDescription()
+    {
+        return 'Set or show config';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOptions()
+    {
+        return array();
+    }
+
+    public function execute()
     {
         $args = $this->opt->getArgs();
         if (count($args) == 2) {
@@ -120,9 +130,9 @@ class Git_Daily_Command_Config
         self::outLn('config setted');
     }
 
-    public static function usage()
+    public function usage()
     {
-        fwrite(STDERR, <<<E
+        return <<<E
 Usage: git daily config <key> <value>
 
 Example:
@@ -140,8 +150,7 @@ Example:
         GitWeb :  git daily config logurl "http://example.com/?p=repositories/example.git;a=commit;h=%s"
         GitHub :  git daily config logurl "https://github.com/sotarok/git-daily/commit/%s"
 
-E
-        );
+E;
     }
 }
 

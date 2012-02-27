@@ -32,8 +32,7 @@
     <whitelist addUncoveredFilesFromWhitelist="true">
       <directory suffix=".php">src</directory>
       <exclude>
-        <!-- <file>PHPUnit/Autoload.php</file> -->
-        <!-- <file>PHPUnit/Framework/Assert/Functions.php</file> -->
+        <directory>src/bin</directory>
       </exclude>
     </whitelist>
   </filter>

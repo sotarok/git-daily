@@ -6,15 +6,21 @@
 
 class Git_Daily_GitUtil
 {
-    public static function isClean()
+
+    public function __construct(Git_Daily_CommandUtil $cmd)
     {
-        list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('status', '-uno', '-s'));
+        $this->cmd = $cmd;
+    }
+
+    public function isClean()
+    {
+        list($res, ) = $this->cmd->run(Git_Daily::$git, array('status', '-uno', '-s'));
         return empty($res);
     }
 
-    public static function branches()
+    public function branches()
     {
-        list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color'),
+        list($res, ) = $this->cmd->run(Git_Daily::$git, array('branch', '--no-color'),
             array(
                 'sed', array('s/^[^a-zA-Z0-9]*//g'),
             )
@@ -22,9 +28,9 @@ class Git_Daily_GitUtil
         return $res;
     }
 
-    public static function mergedBranches()
+    public function mergedBranches()
     {
-        list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color', '--merged'),
+        list($res, ) = $this->cmd->run(Git_Daily::$git, array('branch', '--no-color', '--merged'),
             array(
                 'sed', array('s/^[^a-zA-Z0-9]*//g'),
             )
@@ -32,9 +38,9 @@ class Git_Daily_GitUtil
         return $res;
     }
 
-    public static function releaseBranches($branch)
+    public function releaseBranches($branch)
     {
-        list($release_branch, ) = Git_Daily_CommandUtil::cmd(
+        list($release_branch, ) = $this->cmd->run(
             Git_Daily::$git, array('branch'),
             array('grep', array("{$branch}/"),
                 array(
@@ -45,13 +51,13 @@ class Git_Daily_GitUtil
         return $release_branch;
     }
 
-    public static function hasBranch($branch)
+    public function hasBranch($branch)
     {
         $branches = self::branches();
         return in_array($branch, $branches);
     }
 
-    public static function hasRemoteBranch($remote, $branch)
+    public function hasRemoteBranch($remote, $branch)
     {
         $remote_branch = self::remoteBranch($remote, $branch);
         if ($remote_branch != null) {
@@ -60,10 +66,10 @@ class Git_Daily_GitUtil
         return false;
     }
 
-    public static function currentBranch()
+    public function currentBranch()
     {
         // git branch --no-color | grep '^\* ' | grep -v 'no branch' | sed 's/^* //g'
-        list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color'),
+        list($res, ) = $this->cmd->run(Git_Daily::$git, array('branch', '--no-color'),
             array(
                 'grep', array('^\*'),
                 array(
@@ -81,9 +87,9 @@ class Git_Daily_GitUtil
         return array_shift($res);
     }
 
-    public static function remoteBranch($remote, $branch)
+    public function remoteBranch($remote, $branch)
     {
-        list($res, ) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('branch', '--no-color', '-a'),
+        list($res, ) = $this->cmd->run(Git_Daily::$git, array('branch', '--no-color', '-a'),
             array(
                 'grep', array("remotes/$remote/$branch"),
                 array(

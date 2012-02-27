@@ -7,12 +7,13 @@ class Git_Daily_CommandUtil
 {
     const YESNO_YES = 1;
     const YESNO_NO  = 2;
-    public static function get()
+
+    public function get()
     {
         return fgets(STDIN);
     }
 
-    public static function yesNo($message = "", $default = self::YESNO_YES)
+    public function yesNo($message = "", $default = self::YESNO_YES)
     {
         $default_yes = ($default == self::YESNO_YES) ? true : false;
         fwrite(STDOUT, $message);
@@ -22,7 +23,7 @@ class Git_Daily_CommandUtil
             fwrite(STDOUT, ' [yN] : ');
         }
 
-        $answer = trim(self::get());
+        $answer = trim($this->get());
         if (empty($answer)) {
             $answer = ($default_yes) ? 'y' : 'n';
         }
@@ -35,21 +36,26 @@ class Git_Daily_CommandUtil
         }
     }
 
-    public static function cmd($cmd, $options, array $pipe = array())
+    public function run($cmd, $options, array $pipe = array())
     {
-        $cmd_string = self::buildCmdString($cmd, $options, $pipe);
-        exec($cmd_string, $ret, $retval);
+        $cmd_string = $this->buildCmdString($cmd, $options, $pipe);
+        $this->executeCommand($cmd_string, $ret, $retval);
 
         return array($ret, $retval);
     }
 
-    public static function buildCmdString($cmd, $options, array $pipe = array())
+    public function executeCommand($cmd_string, &$ret, &$retval)
+    {
+        return exec($cmd_string, $ret, $retval);
+    }
+
+    public function buildCmdString($cmd, $options, array $pipe = array())
     {
         $options = array_map('escapeshellarg', $options);
         $cmd_string = $cmd . ' ' . implode(' ', $options) . ' 2>&1';
 
         if (!empty($pipe)) {
-            $cmd_string .= ' | ' . call_user_func_array(array('self', 'buildCmdString'), $pipe);
+            $cmd_string .= ' | ' . call_user_func_array(array($this, 'buildCmdString'), $pipe);
         }
 
         return $cmd_string;

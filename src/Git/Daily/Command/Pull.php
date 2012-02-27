@@ -6,15 +6,29 @@
 class Git_Daily_Command_Pull
     extends Git_Daily_CommandAbstract
 {
-    const DESCRIPTION = 'Pull remote to local (for only same branch)';
-
-    protected $option = array(
-        'rebase' => array(null, 'rebase', Git_Daily_OptionParser::ACT_STORE_TRUE),
-    );
-
+    // TODO
     protected $load_config = true;
 
-    public function runCommand()
+    /**
+     * {@inheritDoc}
+     */
+    public function getOptions()
+    {
+        return array(
+            'rebase' => array(null, 'rebase', Git_Daily_OptionParser::ACT_STORE_TRUE),
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDescription()
+    {
+        return 'Pull remote to local (for only same branch)';
+    }
+
+
+    public function execute()
     {
         if (!isset($this->config['remote'])) {
             throw new Git_Daily_Exception('no remote setting');
@@ -52,13 +66,12 @@ class Git_Daily_Command_Pull
         return 'pull completed';
     }
 
-    public static function usage()
+    public function usage()
     {
-        fwrite(STDERR, <<<E
+        return <<<E
 usage: git daily pull
    or: git daily pull --rebase
 
-E
-        );
+E;
     }
 }

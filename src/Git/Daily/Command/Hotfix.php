@@ -43,15 +43,14 @@ class Git_Daily_Command_Hotfix
         }
     }
 
-    public static function usage()
+    public function usage()
     {
-        fwrite(STDERR, <<<E
+        return <<<E
 Usage: git daily hotfix open        : Open hotfix-release process
    or: git daily hotfix list        : Show hotfix list
    or: git daily hotfix sync        : Sync current opened hotfix process
    or: git daily hotfix close       : Close to hotfix-release process
 
-E
-        );
+E;
     }
 }
