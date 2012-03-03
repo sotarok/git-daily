@@ -6,9 +6,8 @@
 require_once GIT_DAILY_SRC_DIR . '/Git/Daily/GitUtil.php';
 
 class Git_Daily_GitUtilTest
-    extends PHPUnit_Framework_TestCase
+    extends Git_Daily_GitTestCase
 {
-    const TMP_REPO = 'tmp_gitutil_test';
 
     private $orig_dir;
     private $dir;
@@ -17,25 +16,26 @@ class Git_Daily_GitUtilTest
 
     public function setUp()
     {
+        parent::setUp();
         $this->orig_dir = getcwd();
+
         Git_Daily::$git = trim(`which git`);
-
-        $tmpdir = GIT_DAILY_TMP_DIR . DIRECTORY_SEPARATOR . self::TMP_REPO;
-        if (is_dir($tmpdir)) {
-            `rm -rf $tmpdir`;
-        }
-        `mkdir $tmpdir && cd $tmpdir && git init && touch README && git add README && git commit -m "initial"`;
-
-        $this->dir = $tmpdir;
-
         $this->git = new Git_Daily_GitUtil(new Git_Daily_CommandUtil());
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        Git_Daily::$git = null;
+        chdir($this->orig_dir);
     }
 
     public function testIsClean()
     {
-        chdir($this->dir);
+        chdir($this->getTmpRepositoryDir());
 
-        $tmpfile = $this->dir . '/README';
+        $tmpfile = $this->getTmpRepositoryDir() . '/README';
         $this->assertTrue($this->git->isClean());
 
         file_put_contents($tmpfile, 'hoge');
@@ -47,7 +47,7 @@ class Git_Daily_GitUtilTest
 
     public function testBranches()
     {
-        chdir($this->dir);
+        chdir($this->getTmpRepositoryDir());
 
         $this->assertEquals(array('master'), $this->git->branches());
 
@@ -61,7 +61,7 @@ class Git_Daily_GitUtilTest
 
     public function testMergedBranches()
     {
-        chdir($this->dir);
+        chdir($this->getTmpRepositoryDir());
 
         $this->assertEquals(array('master'), $this->git->mergedBranches());
 
@@ -74,27 +74,21 @@ class Git_Daily_GitUtilTest
 
     public function testReleaseBranches()
     {
-        chdir($this->dir);
+        chdir($this->getTmpRepositoryDir());
         $this->assertEquals(array(), $this->git->releaseBranches('release'));
     }
 
     public function testHasBranch()
     {
-        chdir($this->dir);
+        chdir($this->getTmpRepositoryDir());
         $this->assertTrue($this->git->hasBranch('master'));
         $this->assertFalse($this->git->hasBranch('hoge'));
     }
 
     public function testCurrentBranch()
     {
-        chdir($this->dir);
+        chdir($this->getTmpRepositoryDir());
         $this->assertEquals('master', $this->git->currentBranch());
     }
 
-    public function tearDown()
-    {
-        `rm -rf {$this->dir}`;
-        Git_Daily::$git = null;
-        chdir($this->orig_dir);
-    }
 }

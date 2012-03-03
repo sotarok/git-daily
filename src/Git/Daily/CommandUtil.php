@@ -40,6 +40,8 @@ class Git_Daily_CommandUtil
     {
         $cmd_string = $this->buildCmdString($cmd, $options, $pipe);
         $this->executeCommand($cmd_string, $ret, $retval);
+        //var_dump($cmd_string);
+        //var_dump($ret);
 
         return array($ret, $retval);
     }

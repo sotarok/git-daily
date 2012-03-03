@@ -9,21 +9,22 @@ abstract class Git_Daily_CommandAbstract
     public static $last_command_result;
     public static $last_command_retval;
 
-    protected $daily = null;
+    protected $context = null;
     protected $cmd = null;
     protected $output = null;
 
     protected $load_config = false;
 
     public function __construct(
-        Git_Daily $daily,
+        Git_Daily $context,
         $args,
         Git_Daily_OutputInterface $output,
         Git_Daily_CommandUtil $cmd
     ) {
-        $this->daily = $daily;
+        $this->context = $context;
         $this->output = $output;
         $this->cmd = $cmd;
+        $this->git = new Git_Daily_GitUtil($cmd);
         $this->opt = new Git_Daily_OptionParser($args, $this->getOptions());
 
         if ($this->load_config) {
@@ -39,7 +40,7 @@ abstract class Git_Daily_CommandAbstract
 
     public function createCommand($class_name, $args = array())
     {
-        return new $class_name($this->daily, $args, $this->output, $this->cmd);
+        return new $class_name($this->context, $args, $this->output, $this->cmd);
     }
 
     public function cmd($cmd, $options, array $pipe = array())

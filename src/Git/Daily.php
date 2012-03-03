@@ -48,11 +48,26 @@ class Git_Daily
             self::$git = $git_cmd;
         }
 
-        $this->cmd= $cmd;
+        $this->cmd = $cmd;
 
         $this->checkGitVersion();
         $this->findGitDir();
         $this->registerCommands();
+
+        $this->config = new Git_Daily_Config($this);
+    }
+
+    /**
+     * @return object Git_Daily_Config
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    public function getCommandUtil()
+    {
+        return $this->cmd;
     }
 
     private function findGitDir()
@@ -66,6 +81,11 @@ class Git_Daily
     public function getGitDir()
     {
         return $this->git_dir;
+    }
+
+    public function onGitRepository()
+    {
+        return !is_null($this->git_dir);
     }
 
     private function checkGitVersion()
@@ -84,6 +104,8 @@ class Git_Daily
                 self::E_GIT_VERSION_COMPAT, null, true
             );
         }
+
+        return true;
     }
 
     public function registerCommand($name, $class)

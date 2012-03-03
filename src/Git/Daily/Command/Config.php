@@ -29,44 +29,42 @@ class Git_Daily_Command_Config
         return array();
     }
 
+    /**
+     * @TODO support --global ?
+     */
     public function execute()
     {
+        $config = $this->context->getConfig();
         $args = $this->opt->getArgs();
         if (count($args) == 2) {
-            $key = $args[0];
-            $value = $args[1];
-            return $this->_setConfig($key, $value);
+            return $this->setConfig($key = $args[0], $value = $args[1]);
         }
 
-        // else show config
-        $option = array('config', '--list',);
-        $pipe = array('grep', array('gitdaily'));
-        $return = self::cmd(Git_Daily::$git, $option, $pipe);
-
-        if (empty($return)) {
-            //return "git-daily: not initialized. please run:\n   git daily init";
-            throw new Git_Daily_Exception(
-                "git-daily: not initialized. please run: git daily init",
-                Git_Daily::E_NOT_INITIALIZED, null, true
-            );
+        if (count($args) == 1) {
+            return $config->get($args[0]);
         }
-        return $return;
+
+        $config_list = array();
+        foreach ($config->getAll() as $key => $value) {
+            $config_list[] = "$key = $value";
+        }
+        return $config_list;
     }
 
-    private function _setConfig($key, $value)
+    private function setConfig($key, $value)
     {
         switch ($key) {
         case 'remote':
-            $this->_setConfigRemote($value);
+            $this->setConfigRemote($value);
             break;
         case 'develop':
-            $this->_setConfigDevelop($value);
+            $this->setConfigDevelop($value);
             break;
         case 'master':
-            $this->_setConfigMaster($value);
+            $this->setConfigMaster($value);
             break;
         case 'logurl':
-            $this->_setConfigLogurl($value);
+            $this->setConfigLogurl($value);
             break;
         default:
             throw new Git_Daily_Exception(
@@ -76,19 +74,14 @@ class Git_Daily_Command_Config
         }
     }
 
-    private function _setConfigRemote($value)
+    private function setConfigRemote($value)
     {
-        $remote_url_list = self::cmd(
-            Git_Daily::$git,
-            array('config', '--list'),
-            array('grep', array('remote'),
-                array('grep', array('url'))
-            )
-        );
+        // TODO : use gitutil
+        $remote_url_list = $this->cmd(Git_Daily::$git, array('config', '--get-regexp', '^remote.*url$'));
         foreach ($remote_url_list as $remote_url) {
-            if (preg_match("/^remote\.$value\.url=/", $remote_url)) {
-                self::cmd(Git_Daily::$git, array('config', 'gitdaily.remote', $value));
-                self::outLn('config setted');
+            if (preg_match("/^remote\.$value\.url /", $remote_url)) {
+                $this->context->getConfig()->set('remote', $value);
+                $this->output->outLn('config set');
                 return true;
             }
         }
@@ -99,35 +92,35 @@ class Git_Daily_Command_Config
         );
     }
 
-    private function _setConfigDevelop($value)
+    private function setConfigDevelop($value)
     {
         // branch check
-        $branches = Git_Daily_GitUtil::branches();
+        $branches = $this->git->branches();
         if (!in_array($value, $branches)) {
             throw new Git_Daily_Exception("no such branch: $value");
         }
 
-        self::cmd(Git_Daily::$git, array('config', 'gitdaily.develop', $value));
-        self::outLn('config setted');
+        $this->context->getConfig()->set('develop', $value);
+        $this->output->outLn('config set');
     }
 
-    private function _setConfigMaster($value)
+    private function setConfigMaster($value)
     {
         // branch check
-        $branches = Git_Daily_GitUtil::branches();
+        $branches = $this->git->branches();
         if (!in_array($value, $branches)) {
             throw new Git_Daily_Exception("no such branch: $value");
         }
 
-        self::cmd(Git_Daily::$git, array('config', 'gitdaily.master', $value));
-        self::outLn('config setted');
+        $this->context->getConfig()->set('master', $value);
+        $this->output->outLn('config set');
     }
 
-    private function _setConfigLogurl($value)
+    private function setConfigLogurl($value)
     {
         // TODO: something validation?
-        self::cmd(Git_Daily::$git, array('config', 'gitdaily.logurl', $value));
-        self::outLn('config setted');
+        $this->context->getConfig()->set('logurl', $value);
+        $this->output->outLn('config set');
     }
 
     public function usage()
