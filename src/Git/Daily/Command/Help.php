@@ -37,7 +37,7 @@ class Git_Daily_Command_Help
 
 
         if (!empty($name)) {
-            $cmd_class = $this->daily->findCommand($name);
+            $cmd_class = $this->context->findCommand($name);
             if (!$cmd_class) {
                 throw new Git_Daily_Exception(
                     "no such subcommand: $name",
@@ -49,7 +49,7 @@ class Git_Daily_Command_Help
         }
         else {
             // TODO
-            $this->daily->findCommand($name);
+            $this->context->findCommand($name);
         }
     }
 }

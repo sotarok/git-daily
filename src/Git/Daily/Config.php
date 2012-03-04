@@ -91,8 +91,14 @@ class Git_Daily_Config
                 continue;
             }
             $sep = strpos($confline, ' ');
-            $key = str_replace('gitdaily.', '', substr($confline, 0, $sep));
-            $value = substr($confline, $sep + 1);
+            if (false === $sep) {
+                $key = str_replace('gitdaily.', '', $confline);
+                $value = null;
+            } else {
+                $key = str_replace('gitdaily.', '', substr($confline, 0, $sep));
+                $value = substr($confline, $sep + 1);
+            }
+
             if ($value === 'true') {
                 $value = true;
             }
@@ -112,7 +118,11 @@ class Git_Daily_Config
      */
     protected function setLocalConfig($key, $value)
     {
-        list($result, $retval) = $this->cmd->run(Git_Daily::$git, array('config', 'gitdaily.' . $key, $value));
+        if (is_bool($value)) {
+            list($result, $retval) = $this->cmd->run(Git_Daily::$git, array('config', 'gitdaily.' . $key, $value ? 'true' : 'false'));
+        } else {
+            list($result, $retval) = $this->cmd->run(Git_Daily::$git, array('config', 'gitdaily.' . $key, $value));
+        }
         if ($retval != 0) {
             throw new Git_Daily_Exception(sprintf("Failed to set git config, git returns error: output=%s", implode(PHP_EOL, $result)));
         }
@@ -126,7 +136,11 @@ class Git_Daily_Config
      */
     protected function setGlobalConfig($key, $value)
     {
-        list($result, $retval) = $this->cmd->run(Git_Daily::$git, array('config', '--global', 'gitdaily.' . $key, $value));
+        if (is_bool($value)) {
+            list($result, $retval) = $this->cmd->run(Git_Daily::$git, array('config', '--global', 'gitdaily.' . $key, $value ? 'true' : 'false'));
+        } else {
+            list($result, $retval) = $this->cmd->run(Git_Daily::$git, array('config', '--global', 'gitdaily.' . $key, $value));
+        }
         if ($retval != 0) {
             throw new Git_Daily_Exception(sprintf("Failed to set global git config, git returns error: output=%s", implode(PHP_EOL, $result)));
         }

@@ -91,4 +91,18 @@ class Git_Daily_GitUtilTest
         $this->assertEquals('master', $this->git->currentBranch());
     }
 
+    public function testRemotes()
+    {
+        chdir($this->getTmpRepositoryDir());
+        $this->assertEmpty($this->git->remotes());
+
+        `git remote add origin git://example.com/sample.git`;
+        $this->assertEquals(array('origin' => 'git://example.com/sample.git'), $this->git->remotes());
+
+        $this->assertTrue($this->git->hasRemote('origin'));
+        $this->assertFalse($this->git->hasRemote('noorigin'));
+
+        // clean up
+        `git remote rm origin`;
+    }
 }

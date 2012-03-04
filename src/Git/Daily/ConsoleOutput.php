@@ -7,7 +7,7 @@
 class Git_Daily_ConsoleOutput
     implements Git_Daily_OutputInterface
 {
-    public function write($string)
+    public function printString($string)
     {
         echo $string;
     }
@@ -15,25 +15,25 @@ class Git_Daily_ConsoleOutput
     public function info()
     {
         $string = call_user_func_array(array($this, 'formatString'), func_get_args());
-        $this->write("[36m" . $string . "[0m" . PHP_EOL);
+        $this->printString("[36m" . $string . "[0m" . PHP_EOL);
     }
 
     public function warn()
     {
         $string = call_user_func_array(array($this, 'formatString'), func_get_args());
-        $this->write("[41;37m" . $string . "[0m" . PHP_EOL);
+        $this->printString("[41;37m" . $string . "[0m" . PHP_EOL);
     }
 
-    public function out()
+    public function write()
     {
         $string = call_user_func_array(array($this, 'formatString'), func_get_args());
-        $this->write($string);
+        $this->printString($string);
     }
 
-    public function outLn()
+    public function writeLn()
     {
         $string = call_user_func_array(array($this, 'formatString'), func_get_args());
-        $this->write($string . PHP_EOL);
+        $this->printString($string . PHP_EOL);
     }
 
     public function formatString()

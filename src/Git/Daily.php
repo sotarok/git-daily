@@ -167,7 +167,7 @@ class Git_Daily
                 if (!is_array($result)) {
                     $result = array($result);
                 }
-                call_user_func_array(array($output, 'outLn'), $result);
+                call_user_func_array(array($output, 'writeLn'), $result);
             }
 
             return 0;

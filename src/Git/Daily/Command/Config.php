@@ -41,30 +41,42 @@ class Git_Daily_Command_Config
         }
 
         if (count($args) == 1) {
-            return $config->get($args[0]);
+            $value = $config->get($args[0]);
+            if (is_bool($value)) {
+                return $value ? 'true' : 'false';
+            } else {
+                return $value;
+            }
         }
 
         $config_list = array();
         foreach ($config->getAll() as $key => $value) {
-            $config_list[] = "$key = $value";
+            if (is_bool($value)) {
+                $config_list[] = "$key = " . ($value ? 'true' : 'false');
+            } else {
+                $config_list[] = "$key = $value";
+            }
         }
         return $config_list;
     }
 
+    /**
+     * @return mixed output
+     */
     private function setConfig($key, $value)
     {
         switch ($key) {
         case 'remote':
-            $this->setConfigRemote($value);
+            return $this->setConfigRemote($value);
             break;
         case 'develop':
-            $this->setConfigDevelop($value);
+            return $this->setConfigDevelop($value);
             break;
         case 'master':
-            $this->setConfigMaster($value);
+            return $this->setConfigMaster($value);
             break;
         case 'logurl':
-            $this->setConfigLogurl($value);
+            return $this->setConfigLogurl($value);
             break;
         default:
             throw new Git_Daily_Exception(
@@ -77,12 +89,11 @@ class Git_Daily_Command_Config
     private function setConfigRemote($value)
     {
         // TODO : use gitutil
-        $remote_url_list = $this->cmd(Git_Daily::$git, array('config', '--get-regexp', '^remote.*url$'));
-        foreach ($remote_url_list as $remote_url) {
-            if (preg_match("/^remote\.$value\.url /", $remote_url)) {
+        $remotes = $this->git->remotes();
+        foreach ($remotes as $remote_name => $remote_url) {
+            if ($remote_name == $value) {
                 $this->context->getConfig()->set('remote', $value);
-                $this->output->outLn('config set');
-                return true;
+                return 'config set';
             }
         }
 
@@ -101,7 +112,7 @@ class Git_Daily_Command_Config
         }
 
         $this->context->getConfig()->set('develop', $value);
-        $this->output->outLn('config set');
+        return 'config set';
     }
 
     private function setConfigMaster($value)
@@ -113,14 +124,14 @@ class Git_Daily_Command_Config
         }
 
         $this->context->getConfig()->set('master', $value);
-        $this->output->outLn('config set');
+        return 'config set';
     }
 
     private function setConfigLogurl($value)
     {
         // TODO: something validation?
         $this->context->getConfig()->set('logurl', $value);
-        $this->output->outLn('config set');
+        return 'config set';
     }
 
     public function usage()

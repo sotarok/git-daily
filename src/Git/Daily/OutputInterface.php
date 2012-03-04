@@ -7,7 +7,10 @@
 interface Git_Daily_OutputInterface
 {
     /**
-     * @param string $string
      */
-    public function write($string);
+    public function write(/* polymorphism */);
+
+    /**
+     */
+    public function writeLn(/* polymorphism */);
 }

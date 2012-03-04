@@ -12,6 +12,7 @@ abstract class Git_Daily_CommandAbstract
     protected $context = null;
     protected $cmd = null;
     protected $output = null;
+    protected $opt = null;
 
     protected $load_config = false;
 
@@ -26,16 +27,7 @@ abstract class Git_Daily_CommandAbstract
         $this->cmd = $cmd;
         $this->git = new Git_Daily_GitUtil($cmd);
         $this->opt = new Git_Daily_OptionParser($args, $this->getOptions());
-
-        if ($this->load_config) {
-            $config = new Git_Daily_Command_Config(array(), $output, $cmd);
-            $config_vars = $config->execute();
-            foreach ($config_vars as $config_var) {
-                $config_line = explode('=', $config_var);
-                $key = str_replace('gitdaily.', '', array_shift($config_line));
-                $this->config[$key] =  implode('=', $config_line);
-            }
-        }
+        $this->config = $this->context->getConfig();
     }
 
     public function createCommand($class_name, $args = array())

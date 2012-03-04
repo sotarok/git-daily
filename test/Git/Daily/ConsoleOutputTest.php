@@ -33,7 +33,7 @@ class Git_Daily_ConsoleOutputTest
     public function testOut($args, $expected)
     {
         $this->expectOutputString($expected);
-        call_user_func_array(array($this->output, 'out'), $args);
+        call_user_func_array(array($this->output, 'write'), $args);
     }
 
     public function outProvider()
@@ -57,7 +57,7 @@ class Git_Daily_ConsoleOutputTest
     {
         $output = new Git_Daily_ConsoleOutput();
         $this->expectOutputString($expected);
-        call_user_func_array(array($this->output, 'outLn'), $args);
+        call_user_func_array(array($this->output, 'writeLn'), $args);
     }
 
     public function outLnProvider()
