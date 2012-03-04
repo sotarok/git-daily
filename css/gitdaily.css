@@ -1,0 +1,27 @@
+.head {
+  margin-top: 50px;
+}
+.main {
+  margin-top: 50px;
+}
+.download {
+  margin-top: 30px;
+}
+.download p {
+  font-weight: bold;
+}
+.footer {
+  background: #404040;
+  color: #fff;
+  padding: 20px 40px 30px;
+}
+.footer img {
+  vertical-align: middle;
+}
+.footer a {
+  color: #f0f0f0;
+}
+.footer a:hover {
+  color: #ccc;
+  text-decoration: none;
+}

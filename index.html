@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <meta name="robots" content="INDEX,FOLLOW" />
 
-  <title>sotarok/git-daily @ GitHub</title>
+  <!-- additinal header
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+      google.load("jquery", "1.5");
+  </script>
+
+  <script type="text/javascript" src="/js/script.js"></script>
+
+  <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="/rss" />
 
   <style type="text/css">
+  </style>
+  -->
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="css/gitdaily.css" type="text/css" media="all" />
+
+  <title>git-daily @ GitHub</title>
+
+
+  <style type="text/css">
+    /*
     body {
       margin-top: 1.0em;
       background-color: #a398c9;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
       color: #000000;
     }
     #container {
@@ -27,36 +48,124 @@
     pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
+    */
   </style>
 </head>
 
 <body>
-  <a href="http://github.com/sotarok/git-daily"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<a href="http://github.com/sotarok/git-daily"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
-  <div id="container">
+<div class="head container">
+  <div class="row">
+    <div class="span9 title">
+      <h1><a href="http://github.com/sotarok/git-daily"><img src="images/git-daily-logo.png" alt="git-daily" /></a></h1>
+      <p>
+      "git-daily" is a tool which helps you to do daily workflow easier.
+      Using <a href="http://nvie.com/posts/a-successful-git-branching-model/">a branching model</a> for <a href="https://github.com/nvie/gitflow">gitflow</a>, improve on:
+      </p>
+      <ul>
+        <li>Specialized release managements for a web application,</li>
+        <li>Support your remote operations.</li>
+      </ul>
 
-    <div class="download">
-      <a href="http://github.com/sotarok/git-daily/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/sotarok/git-daily/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+    </div>
+    <div class="span3">
+      <div class="download">
+        <p><a href="http://github.com/sotarok/git-daily/zipball/master"><i class="icon-download"></i> Ver. 0.1.6: Download .zip</a></p>
+        <p><a href="http://github.com/sotarok/git-daily/tarball/master"><i class="icon-download"></i> Ver. 0.1.6: Download .tar</a></p>
+        <p>
+          <a href="http://travis-ci.org/#!/sotarok/git-daily"><i class="icon-ok-sign"></i> <img src="https://secure.travis-ci.org/sotarok/git-daily.png?branch=master" /></a>
+        </p>
+        <p>
+        <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=sotarok&repo=git-daily&type=watch&count=true"
+          allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+        <iframe class="github-btn" src="http://markdotto.github.com/github-buttons/github-btn.html?user=sotarok&amp;repo=git-daily&amp;type=fork&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="95px" height="20px"></iframe>
+        </p>
+        <p>
+        <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=sotarok&type=follow&count=true"
+            allowtransparency="true" frameborder="0" scrolling="0" width="165px" height="20px"></iframe>
+        </p>
+        <p>
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://github.com/sotarok/git-daily" data-via="sotarok" data-related="sotarok" data-hashtags="gitdaily">Tweet</a>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+        <div class="fb-like" data-href="https://github.com/sotarok/git-daily" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div>
+        </p>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main container">
+  <div class="row">
+    <div class="span8">
+      <script src="http://speakerdeck.com/embed/4e99284cc79f8f005400be24.js"></script>
+    </div>
+    <div class="span4">
+
+      <h2>Usage</h2>
+      <pre>git daily init
+git daily config
+git daily push
+git daily pull
+git daily release open
+git daily release list
+git daily release sync
+git daily release close
+git daily hotfix  open
+git daily hotfix  list
+git daily hotfix  sync
+git daily hotfix  close
+git daily version
+git daily help</pre>
     </div>
 
-    <h1><a href="http://github.com/sotarok/git-daily">git-daily</a>
-      <span class="small">by <a href="http://github.com/sotarok">sotarok</a></span></h1>
-
-    <div class="description">
-      "git-daily" is a tool which helps you to do daily workflow easier on Git.
-    </div>
+    <div class="span12">
 
     <h2>Dependencies</h2>
-<pre>Git >= 1.7.0
+      <pre>Git >= 1.7.0
 PHP >= 5.2.0</pre>
-<h2>Install</h2>
-<pre>pear channel-discover openpear.org
-pear install openpear/Git_Daily</pre>
-<h2>License</h2>
-<pre>The BSD License
+
+    <h2>Install</h2>
+    <p>
+      If you are not using PHP, install PHP CLI version by apt first (on Debian or Ubuntu):
+      <pre>$ sudo apt-get install php5-cli php-pear</pre>
+    </p>
+
+    <p>
+      You can install via <a href="http://openpear.org/package/Git_Daily">Openpear</a>
+    </p>
+    <pre>$ pear channel-discover openpear.org
+$ pear install openpear/Git_Daily</pre>
+
+    <h2>Download Sources</h2>
+    <p>
+      You can download this project in either
+      <a href="http://github.com/sotarok/git-daily/zipball/master">zip</a> or
+      <a href="http://github.com/sotarok/git-daily/tarball/master">tar</a> formats.
+    </p>
+    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+      by running:
+      <pre>$ git clone git://github.com/sotarok/git-daily</pre>
+    </p>
+
+    <h2>Authors</h2>
+    <p>
+      Sotaro Karasawa (sotarok@crocos.co.jp)<br/>
+      Yoshiyuki Asaba (yoshiyuki.asaba@gree.co.jp)<br/>
+    </p>
+
+    <h2>License</h2>
+    <pre>The BSD License
 
 Copyright (c) 2011, Sotaro Karasawa
 All rights reserved.
@@ -86,27 +195,15 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre>
-<h2>Authors</h2>
-<p>Sotaro KARASAWA (sotarok@crocos.co.jp)<br/><br/>      </p>
-
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/sotarok/git-daily/zipball/master">zip</a> or
-      <a href="http://github.com/sotarok/git-daily/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/sotarok/git-daily</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/sotarok/git-daily">sotarok/git-daily</a>
     </div>
-
   </div>
 
-  
+</div>
+
+<div class="footer">
+  <img src="images/github_white_black_cat_32.png" /> Get the source code on GitHub : <a href="http://github.com/sotarok/git-daily">sotarok/git-daily</a>
+</div>
+
+</div>
 </body>
 </html>
