@@ -1,0 +1,10 @@
+language: php
+php:
+  - 5.3
+  - 5.4
+
+notifications:
+  email: false
+  irc: "irc.freenode.org#gitdaily"
+
+script: phpunit --coverage-text
