@@ -1,0 +1,41 @@
+#!/usr/bin/php -d phar.readonly=0
+<?php
+if (ini_get('phar.readonly')) {
+    echo <<<'E'
+git-daily: Fatal: please disable phar.readonly on your php.ini.
+E;
+    exit;
+}
+
+define('BASE_DIR', dirname(__DIR__));
+
+$phar_file =  BASE_DIR . '/git-daily.phar';
+if (file_exists($phar_file)) {
+    unlink($phar_file);
+}
+
+$phar = new Phar($phar_file, 0, 'git-daily.phar');
+$phar->setSignatureAlgorithm(Phar::SHA1);
+$phar->startBuffering();
+$phar->buildFromDirectory(dirname(dirname(__FILE__)), '#src/.*\.php$#');
+
+$content = file_get_contents(BASE_DIR . '/bin/git-daily');
+$content = preg_replace('{^#!@php_bin@\s*}', '', $content);
+$phar->addFromString('bin/git-daily', $content);
+$phar->addFile(BASE_DIR . '/README.rst','README');
+$phar->stopBuffering();
+$phar->setStub(<<<'EOF'
+#!/usr/bin/env php
+<?php
+/**
+ *  @package    Git_Daily
+ *  @author     sotarok
+ *  @license    The BSD License
+ */
+
+\Phar::mapPhar('git-daily.phar');
+require 'phar://git-daily.phar/bin/git-daily';
+
+__HALT_COMPILER();
+EOF
+);
