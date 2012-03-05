@@ -3,34 +3,47 @@ Feature: git-daily
 
   Scenario: Version
     Given I am in a git repository "tmp/local"
-    #When I run the command "git daily version"
      When I run "git daily version"
      Then It should contains:
        """
        git-daily: version
        """
 
-  #Scenario: Initialization
-  #  Given I am in a git repository "tmp/local"
-  #    And I am on the git branch "master"
-  #   When I run "git daily init" with:
-  #     """
+  Scenario: No subcommand specified
+    Given I am in a git repository "tmp/local"
+      And I am on the git branch "master"
+     When I run "git daily"
+     Then It should contains:
+       """
+       Fatal: No subcommand specified
+       """
 
+  Scenario: No such command
+    Given I am in a git repository "tmp/local"
+      And I am on the git branch "master"
+     When I run "git daily aoi"
+     Then It should contains:
+       """
+       No such subcommand: aoi
+       """
 
+  Scenario: Initialization
+    Given I am in a git repository "tmp/local"
+      And I am on the git branch "master"
+     When I run "git daily init --master master --develop develop"
+     Then It should contains:
+       """
+       completed to initialize
+       """
 
-  #     """
-  #   Then It should contains:
-  #     """
-  #     git-daily completed to initialize.
-  #     """
-
-  #Scenario: Already initialized
-  #  Given I am in a git repository "tmp/local"
-  #    And I am on the git branch "master"
-  #   When I run "git daily init" with:
-  #     """
-
-
+  Scenario: Already initialized
+    Given I am in a git repository "tmp/local"
+      And I am on the git branch "master"
+     When I run "git daily init"
+     Then It should contains:
+       """
+       Fatal: git-daily already initialized
+       """
 
   #     """
   #   Then It should fails and contains:

@@ -29,10 +29,9 @@ class Git_DailyBehatTest
                 '--lang' => 'en',
                 '--format' => 'progress',
             ));
-            $output = new ConsoleOutput();
             $app = new BehatApplication('unknown');
             $app->setAutoExit(false);
-            $result = $app->run($input, $output);
+            $result = $app->run($input);
             $this->assertEquals(0, $result);
         } catch (\Exception $e) {
             $this->fail($e->getMessage());

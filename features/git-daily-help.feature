@@ -1,6 +1,17 @@
 Feature: git-daily help
   Git daily help
 
+  Scenario: Help
+    Given I am in a git repository "tmp/local"
+     When I run "git daily help"
+     Then It should contains:
+       """
+       git-daily:
+
+       Usage:
+           version    Show git-daily version
+       """
+
   Scenario: Help init
     Given I am in a git repository "tmp/local"
      When I run "git daily help init"
@@ -45,4 +56,27 @@ Feature: git-daily help
            URL template for dump list (will dump commit hash instead of "%s") :
                GitWeb :  git daily config logurl "http://example.com/?p=repositories/example.git;a=commit;h=%s"
                GitHub :  git daily config logurl "https://github.com/sotarok/git-daily/commit/%s"
+       """
+
+  Scenario: Help push
+    Given I am in a git repository "tmp/local"
+     When I run "git daily help push"
+     Then It should contains:
+       """
+       Usage:
+           git daily push
+       """
+
+  Scenario: Help pull
+    Given I am in a git repository "tmp/local"
+     When I run "git daily help pull"
+     Then It should contains:
+       """
+       Usage:
+           git daily pull [--rebase]
+
+       Options:
+
+           --rebase
+               Rebase remote branch instead of merge.
        """

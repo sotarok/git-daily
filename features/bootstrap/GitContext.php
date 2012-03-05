@@ -253,16 +253,10 @@ class GitContext extends BehatContext
     private function getGitDailyCommand($args = '')
     {
         $argv = array('git-daily');
-        foreach (explode(' ', $args) as $arg) {
+        if (!empty($args)) foreach (explode(' ', $args) as $arg) {
             $argv[] = $arg;
         }
         return array(count($argv), $argv);
-        /*
-        $command = sprintf('php %s %s',
-            escapeshellarg(GIT_DAILY_BIN_PATH), $args
-        );
-        return $command;
-         */
     }
 
     private static function moveToNewPath($path)
