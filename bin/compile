@@ -17,7 +17,7 @@ if (file_exists($phar_file)) {
 $phar = new Phar($phar_file, 0, 'git-daily.phar');
 $phar->setSignatureAlgorithm(Phar::SHA1);
 $phar->startBuffering();
-$phar->buildFromDirectory(dirname(dirname(__FILE__)), '#src/.*\.php$#');
+$phar->buildFromDirectory(dirname(dirname(__FILE__)), '#src/Git/Daily.*\.php$#');
 
 $content = file_get_contents(BASE_DIR . '/bin/git-daily');
 $content = preg_replace('{^#!@php_bin@\s*}', '', $content);
