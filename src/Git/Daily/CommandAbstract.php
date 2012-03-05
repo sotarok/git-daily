@@ -9,30 +9,43 @@ abstract class Git_Daily_CommandAbstract
     public static $last_command_result;
     public static $last_command_retval;
 
+    protected $command_name = '';
+
     protected $context = null;
     protected $cmd = null;
     protected $output = null;
     protected $opt = null;
 
-    protected $load_config = false;
-
     public function __construct(
+        $command_name,
         Git_Daily $context,
         $args,
         Git_Daily_OutputInterface $output,
         Git_Daily_CommandUtil $cmd
     ) {
+        $this->command_name = $command_name;
         $this->context = $context;
         $this->output = $output;
         $this->cmd = $cmd;
         $this->git = new Git_Daily_GitUtil($cmd);
-        $this->opt = new Git_Daily_OptionParser($args, $this->getOptions());
+
+        try {
+            $this->opt = new Git_Daily_OptionParser($args, $this->getOptions());
+        } catch (Git_Daily_Exception $e) {
+            throw new Git_Daily_Exception(
+                $e->getMessage(),
+                $e->getCode(),
+                $e,
+                true,
+                $command_name
+            );
+        }
         $this->config = $this->context->getConfig();
     }
 
-    public function createCommand($class_name, $args = array())
+    public function createCommand($cmd_class, $args = array())
     {
-        return new $class_name($this->context, $args, $this->output, $this->cmd);
+        return new $cmd_class($this->context, $args, $this->output, $this->cmd);
     }
 
     public function cmd($cmd, $options, array $pipe = array())

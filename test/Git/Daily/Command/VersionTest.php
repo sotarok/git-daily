@@ -37,6 +37,7 @@ class Git_Daily_Command_VersionTest
     {
         $cmd_util = new Git_Daily_CommandUtil();
         return new Git_Daily_Command_Version(
+            'version',
             new Git_Daily($cmd_util),
             array(),
             new Git_Daily_ConsoleOutput(),

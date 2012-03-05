@@ -35,7 +35,6 @@ class Git_Daily_Command_Help
         $args = $this->opt->getArgs();
         $name = reset($args);
 
-
         if (!empty($name)) {
             $cmd_class = $this->context->findCommand($name);
             if (!$cmd_class) {
@@ -44,12 +43,12 @@ class Git_Daily_Command_Help
                     Git_Daily::E_SUBCOMMAND_NOT_FOUND
                 );
             }
-            $cmd = $this->createCommand($cmd_class);
-            return $cmd->usage();
+
+            return $this->context->usage($name);
         }
         else {
-            // TODO
-            $this->context->findCommand($name);
+            return $this->context->usage();
         }
+        return null;
     }
 }

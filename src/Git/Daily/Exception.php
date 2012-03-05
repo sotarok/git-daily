@@ -7,6 +7,9 @@
 class Git_Daily_Exception
     extends Exception
 {
+    private $subcommand = null;
+    private $show_usagea = null;
+
     public function __construct($message = "", $code = 255, $prev = null, $show_usage = false, $subcommand = null)
     {
         if (version_compare(PHP_VERSION, '5.3.0') < 0) {
@@ -16,26 +19,17 @@ class Git_Daily_Exception
             parent::__construct($message, $code, $prev);
         }
 
-        $this->_show_usage = $show_usage;
-        $this->_subcommand = $subcommand;
-
-        if ($show_usage) {
-            if (!empty($message)) {
-                fwrite(STDERR, "[41;37m$message[0m" . PHP_EOL);
-            }
-            if ($subcommand !== null) {
-                Git_Daily::usage($subcommand);
-            }
-        }
+        $this->show_usage = $show_usage;
+        $this->subcommand = $subcommand;
     }
 
     public function isShowUsage()
     {
-        return (bool)$this->_show_usage;
+        return (bool)$this->show_usage;
     }
 
     public function getSubCommand()
     {
-        return $this->_subcommand;
+        return $this->subcommand;
     }
 }

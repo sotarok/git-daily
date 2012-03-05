@@ -139,24 +139,34 @@ class Git_Daily
         return false;
     }
 
+    public function createDummyCommandClass($cmd_name)
+    {
+        $cmd_class = $this->findCommand($cmd_name);
+        if ($cmd_class) {
+            return new $cmd_class($cmd_name, $this, array(), new Git_Daily_ConsoleOutput(), new Git_Daily_CommandUtil());
+        }
+
+        // TODO
+    }
+
     public function run($args, Git_Daily_OutputInterface $output)
     {
         try {
             $file = array_shift($args);
             if (count($args) < 1) {
-                throw new Git_Daily_Exception("no subcommand specified.",
-                    self::E_SUBCOMMAND_NOT_FOUND, null, true, true
+                throw new Git_Daily_Exception("No subcommand specified",
+                    self::E_SUBCOMMAND_NOT_FOUND, null, true
                 );
             }
 
             if (!($cmd_class = $this->findCommand($subcommand = array_shift($args)))) {
                 throw new Git_Daily_Exception(
-                    "no such subcommand: $name",
-                    self::E_SUBCOMMAND_NOT_FOUND
+                    "No such subcommand: $subcommand",
+                    self::E_SUBCOMMAND_NOT_FOUND, null, true
                 );
             }
 
-            $cmd = new $cmd_class($this, $args, $output, $this->cmd);
+            $cmd = new $cmd_class($subcommand, $this, $args, $output, $this->cmd);
 
             if (!$this->getGitDir() && !$cmd->isAllowedOutOfRepo()) {
                 throw new Git_Daily_Exception("not in git repository",
@@ -174,49 +184,55 @@ class Git_Daily
 
             return 0;
         } catch (Git_Daily_Exception $e) {
-            if (!$e->isShowUsage()) {
-                $output->warn("%s: fatal: %s", self::COMMAND, $e->getMessage());
+            $output->warn("Fatal: %s", $e->getMessage());
+            $output->writeLn('');
+            if ($e->isShowUsage()) {
+                $subcommand = $e->getSubCommand();
+                $output->writeLn($this->usage($subcommand));
             }
+
             return $e->getCode();
         }
     }
 
-    public static function usage($subcommand = null, $only_subcommand = false)
+    public function usage($subcommand = null, $only_subcommand = false)
     {
-        // DEPRECATED
+        $usage_str = '';
+
         if ($subcommand === null && !$only_subcommand) {
-            fwrite(STDERR, <<<E
+            $usage_str .= <<<E
 git-daily:
 
 Usage:
 
-E
-            );
-            $lists = self::getSubCommandList();
+E;
+
+            $lists = $this->findCommands();
             $max = 0;
-            foreach ($lists as $list) {
-                if (strlen($list) > $max) {
-                    $max = strlen($list);
+            foreach ($lists as $cmd_name => $cmd_class) {
+                if (strlen($cmd_name) > $max) {
+                    $max = strlen($cmd_name);
                 }
             }
-            foreach ($lists as $list) {
-                fwrite(STDERR, "    ");
-                fwrite(STDERR, str_pad($list, $max + self::USAGE_SPACE, ' '));
-                $command = self::getSubCommand($list);
-                fwrite(STDERR, constant("$command::DESCRIPTION"));
-                fwrite(STDERR, PHP_EOL);
+            foreach ($lists as $cmd_name => $cmd_class) {
+                $usage_str .= "    ";
+                $usage_str .= str_pad($cmd_name, $max + self::USAGE_SPACE, ' ');
+
+                $cmd = $this->createDummyCommandClass($cmd_name);
+                $usage_str .= $cmd->getDescription();
+                $usage_str .= PHP_EOL;
             }
         }
 
         if ($subcommand !== null) {
             try {
-                $command = self::getSubCommand($subcommand);
-                if (is_callable(array($command, 'usage'))) {
-                    call_user_func(array($command, 'usage'));
-                }
+                $cmd = $this->createDummyCommandClass($subcommand);
+                $usage_str .= $cmd->usage();
             } catch (Git_Daily_Exception $e) {
                 // through
             }
         }
+
+        return $usage_str;
     }
 }
