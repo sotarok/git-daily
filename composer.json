@@ -1,0 +1,19 @@
+{
+    "name": "git-daily/git-daily",
+    "type": "library",
+    "description": "git-daily is a git branch management tool using a branching model of gitflow. ",
+    "keywords": ["git"],
+    "homepage": "http://gitdaily.strk.jp",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Sotaro Karasawa",
+            "email": "sotarok@crocos.co.jp",
+            "homepage": "http://strk.jp"
+        }
+    ],
+    "require": {
+        "php": ">=5.2.0",
+        "behat/behat": ">=2.2.2"
+    }
+}

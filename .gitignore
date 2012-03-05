@@ -1,5 +1,7 @@
 git-daily.phar
+composer.phar
 src/bin/git-daily-local
 tmp/
+vendor/
 build/
 phpunit.xml

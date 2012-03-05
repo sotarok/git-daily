@@ -7,4 +7,6 @@ notifications:
   email: false
   irc: "irc.freenode.org#gitdaily"
 
+before_install: sh bin/vendor
+
 script: phpunit --coverage-text

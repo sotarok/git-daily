@@ -1,0 +1,11 @@
+#!/bin/sh
+
+BASE_DIR=$(cd $(dirname $0);pwd)"/.."
+cd $BASE_DIR
+
+if test ! -f $BASE_DIR/composer.phar
+then
+    wget -nc http://getcomposer.org/composer.phar
+fi
+
+php composer.phar install
