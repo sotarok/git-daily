@@ -117,7 +117,9 @@ class Git_Daily
     {
         $this->commands = array(
             'version' => 'Git_Daily_Command_Version',
-            'init'  => 'Git_Daily_Command_Init',
+            'init'    => 'Git_Daily_Command_Init',
+            'push'    => 'Git_Daily_Command_Push',
+            'pull'    => 'Git_Daily_Command_Pull',
             'config'  => 'Git_Daily_Command_Config',
             'help'    => 'Git_Daily_Command_Help',
         );

@@ -30,37 +30,34 @@ class Git_Daily_Command_Pull
 
     public function execute()
     {
-        if (!isset($this->config['remote'])) {
-            throw new Git_Daily_Exception('no remote setting');
+        if (null === $this->config->get('remote')) {
+            throw new Git_Daily_Exception('No remote setting');
         }
 
         // current branch to origin
-        $current_branch = Git_Daily_GitUtil::currentBranch();
+        $current_branch = $this->git->currentBranch();
         if ($current_branch === null) {
-            throw new Git_Daily_Exception('not on any branches');
+            throw new Git_Daily_Exception('Not on any branches');
         }
 
-        $remote = $this->config['remote'];
-        $remote_branch = Git_Daily_GitUtil::remoteBranch($remote, $current_branch);
+        $remote = $this->config->get('remote');
+        $remote_branch = $this->git->hasRemoteBranch($remote, $current_branch);
         if ($remote_branch === null) {
-            throw new Git_Daily_Exception("not remote branch named: $current_branch");
+            throw new Git_Daily_Exception("No remote branch named '$current_branch' exists");
         }
 
         $is_rebase = $this->opt->getOptVar('rebase');
 
-        self::info("run git pull $remote $current_branch" . ($is_rebase ? ' (rebase)' : ''));
+        $this->output->info("[INFO] run: git pull $remote $current_branch" . ($is_rebase ? ' (rebase)' : ''));
         if ($is_rebase) {
-            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('pull', '--rebase', $remote, $current_branch));
+            list($res, $retval) = $this->cmd->run(Git_Daily::$git, array('pull', '--rebase', $remote, $current_branch));
         } else {
-            list($res, $retval) = Git_Daily_CommandUtil::cmd(Git_Daily::$git, array('pull', $remote, $current_branch));
+            list($res, $retval) = $this->cmd->run(Git_Daily::$git, array('pull', $remote, $current_branch));
         }
 
-        self::outLn($res);
+        $this->output->writeLn($res);
         if ($retval != 0) {
-            self::warn("git pull failed:");
-            throw new Git_Daily_Exception(
-                "git pull failed"
-            );
+            throw new Git_Daily_Exception("git pull failed");
         }
 
         return 'pull completed';
@@ -69,8 +66,14 @@ class Git_Daily_Command_Pull
     public function usage()
     {
         return <<<E
-usage: git daily pull
-   or: git daily pull --rebase
+
+Usage:
+    git daily pull [--rebase]
+
+Options:
+
+    --rebase
+        Rebase remote branch instead of merge.
 
 E;
     }
