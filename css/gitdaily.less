@@ -1,9 +1,21 @@
-body {
-  //font-family: Helvetica, Arial, FreeSans, san-serif;
-}
+@import "../bootstrap/less/bootstrap.less";
 
-h1, h2, h3, h4, h5, h6 {
-  //font-family: Georgia , "ヒラギノ明朝 Pro W6","Hiragino Mincho Pro","HGS明朝E","ＭＳ Ｐ明朝",serif;
+@baseFontSize: 14px;
+@baseLineHeight: 1.5em;
+@baseFontFamily: Ruda, Helvetica, Arial, FreeSans, san-serif;
+
+@linkColor: #b33e5c;
+
+@iconSpritePath: "../bootstrap/img/glyphicons-halflings.png";
+@iconWhiteSpritePath: "../bootstrap/img/glyphicons-halflings-white.png";
+
+
+h1 {
+  font-family: 'Ruda', sans-serif;
+  font-size: 90px;
+  height: 130px;
+  font-weight: 900;
+  line-height: 1em;
 }
 
 .head {
@@ -17,10 +29,23 @@ h1, h2, h3, h4, h5, h6 {
 .title {
 }
 
+.container {
+  .row > div {
+    h2, h3, h4, h5, h6 {
+      &:first-child {
+        line-height: 1em;
+        margin-bottom: 1.2em;
+      }
+      //font-family: Georgia , "ヒラギノ明朝 Pro W6","Hiragino Mincho Pro","HGS明朝E","ＭＳ Ｐ明朝",serif;
+    }
+  }
+}
+
 .download {
   margin-top: 30px;
   p {
     font-weight: bold;
+    line-height: 1.2em;
   }
 }
 
