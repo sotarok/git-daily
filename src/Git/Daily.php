@@ -78,16 +78,26 @@ class Git_Daily
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getGitDir()
     {
         return $this->git_dir;
     }
 
-    public function onGitRepository()
+    /**
+     * @return boolan
+     */
+    public function isInGitRepository()
     {
         return !is_null($this->git_dir);
     }
 
+    /**
+     * @throws Git_Daily_Exception
+     * @return boolan
+     */
     private function checkGitVersion()
     {
         // git version check

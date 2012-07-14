@@ -29,7 +29,7 @@ class Git_Daily_Command_Init
 
     public function execute()
     {
-        if (!$this->context->onGitRepository()) {
+        if (!$this->context->isInGitRepository()) {
             throw new Git_Daily_Exception('Not a git repository (or any of the parent directories): .git',
                 Git_Daily::E_NOT_IN_REPO
             );

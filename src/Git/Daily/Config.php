@@ -19,7 +19,7 @@ class Git_Daily_Config
         $this->cmd = $context->getCommandUtil();
 
         $this->config_global = $this->getAllGlobalConfig();
-        if ($this->context->onGitRepository()) {
+        if ($this->context->isInGitRepository()) {
             $this->config = $this->getAllLocalConfig();
         }
     }
@@ -51,7 +51,7 @@ class Git_Daily_Config
 
     public function set($key, $value, $global = false)
     {
-        if (!$global && !$this->context->onGitRepository()) {
+        if (!$global && !$this->context->isInGitRepository()) {
             throw new Git_Daily_Exception('Not a git repository (or any of the parent directories): .git');
         }
 
