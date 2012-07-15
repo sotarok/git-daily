@@ -1,19 +1,17 @@
 <?php
 /**
- *  @package    Git
+ *  @package    Git\Daily
  *  @author     Sotaro Karasawa <sotaro.k@gmail.com>
  */
 
 /**
  *  Git_Daily_Command_Release
  *
- *  @package    Git
+ *  @package    Git\Daily
  */
 class Git_Daily_Command_Release
     extends Git_Daily_CommandAbstract
 {
-
-    protected $load_config = true;
 
     protected $base_branch = 'develop';
 
@@ -40,14 +38,25 @@ class Git_Daily_Command_Release
     }
 
     /**
+     */
+    public function getSubCommands()
+    {
+        return array(
+            'open'  => 'Git_Daily_Command_Release_Open',
+            'sync'  => 'Git_Daily_Command_Release_Sync',
+            'close' => 'Git_Daily_Command_Release_Close',
+        );
+    }
+
+    /**
      *  runCommand
      */
     public function execute()
     {
-        $is_clean = Git_Daily_GitUtil::isClean();
+        $is_clean = $this->git->isClean();
         if (!$is_clean) {
             throw new Git_Daily_Exception(
-                'git status is not clean',
+                'Git status is not clean',
                 Git_Daily::E_GIT_STATUS_NOT_CLEAN,
                 null, true
             );
@@ -56,23 +65,17 @@ class Git_Daily_Command_Release
         $args = $this->opt->getArgs();
         if (empty($args)) {
             throw new Git_Daily_Exception(
-                'please specify release subcommand',
+                "Please specify '{$this->command_name}' subcommand",
                 Git_Daily::E_INVALID_ARGS,
-                null, true, 'release'
+                null, true, $this->command_name
             );
         }
 
-        $arg = reset($args);
-        $method = '_do' . ucfirst(strtolower($arg));
-        if (!is_callable(array($this, $method))) {
-            throw new Git_Daily_Exception(
-                "no such release subcommand: $arg",
-                Git_Daily::E_SUBCOMMAND_NOT_FOUND,
-                null, true, 'release'
-            );
-        }
-
-        return call_user_func(array($this, $method));
+        var_dump($this->opt->getOptVars());
+        var_dump($this->opt->getArgs());
+        exit;
+        $cmd_name = reset($args);
+        return $this->getSubCommand($cmd_name, $this->opt->getArgvArrayWithout(array($cmd_name)))->execute();
     }
 
     /**

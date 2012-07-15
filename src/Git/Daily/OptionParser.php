@@ -12,13 +12,26 @@ class Git_Daily_OptionParser
 
     protected $var = array();
 
+    protected $argv = array();
+
     protected $args = array();
     protected $options = array();
 
     public function __construct($argv, $options)
     {
+        $this->argv = $argv;
         $this->options = $options;
         $this->parse($argv, $options);
+    }
+
+    public function getOriginalArgv()
+    {
+        return $this->argv;
+    }
+
+    public function getArgvArrayWithout(array $ignores)
+    {
+        return $this->args;
     }
 
     public function parse($argv, $options)
@@ -122,6 +135,11 @@ class Git_Daily_OptionParser
             return $this->var[$key];
         }
         return null;
+    }
+
+    public function getOptVars()
+    {
+        return $this->var;
     }
 
     public function getArgs()

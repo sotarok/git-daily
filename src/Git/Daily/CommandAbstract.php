@@ -62,9 +62,33 @@ abstract class Git_Daily_CommandAbstract
         return false;
     }
 
+    /**
+     * @return array    sub-command list
+     * @throws Git_Daily_Exception
+     */
     public function getSubCommands()
     {
-        return array();
+        throw new Git_Daily_Exception(
+            "Command '{$this->command_name}' has no subcommand ",
+            Git_Daily::E_INVALID_ARGS,
+            null, true, $this->command_name
+        );
+    }
+
+    public function getSubCommand($name, $args)
+    {
+        $commands = $this->getSubCommands();
+        if (!isset($commands[$name])) {
+            throw new Git_Daily_Exception(
+                "No such subcommand: $name",
+                Git_Daily::E_SUBCOMMAND_NOT_FOUND,
+                null, true, $this->command_name
+            );
+        }
+
+        $cmd_class = $commands[$name];
+        $cmd = new $cmd_class($name, $this->context, $args, $this->output, $this->cmd);
+        return $cmd;
     }
 
     public function usage()

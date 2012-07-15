@@ -6,7 +6,7 @@
 
 class Git_Daily
 {
-    const VERSION = '0.2.0-dev';
+    const VERSION = '0.9.0-dev';
     const COMMAND = 'git-daily';
 
     const SUPPORTED_MIN_GIT_VERSION = '1.7.0';
@@ -130,17 +130,18 @@ class Git_Daily
             'init'    => 'Git_Daily_Command_Init',
             'push'    => 'Git_Daily_Command_Push',
             'pull'    => 'Git_Daily_Command_Pull',
+            'release' => 'Git_Daily_Command_Release',
             'config'  => 'Git_Daily_Command_Config',
             'help'    => 'Git_Daily_Command_Help',
         );
     }
 
-    public function findCommands()
+    public function getCommands()
     {
         return $this->commands;
     }
 
-    public function findCommand($name)
+    public function getCommand($name)
     {
         if (isset($this->commands[$name])) {
             return $this->commands[$name];
@@ -151,7 +152,7 @@ class Git_Daily
 
     public function createDummyCommandClass($cmd_name)
     {
-        $cmd_class = $this->findCommand($cmd_name);
+        $cmd_class = $this->getCommand($cmd_name);
         if ($cmd_class) {
             return new $cmd_class($cmd_name, $this, array(), new Git_Daily_ConsoleOutput(), new Git_Daily_CommandUtil());
         }
@@ -169,7 +170,7 @@ class Git_Daily
                 );
             }
 
-            if (!($cmd_class = $this->findCommand($subcommand = array_shift($args)))) {
+            if (!($cmd_class = $this->getCommand($subcommand = array_shift($args)))) {
                 throw new Git_Daily_Exception(
                     "No such subcommand: $subcommand",
                     self::E_SUBCOMMAND_NOT_FOUND, null, true
@@ -217,7 +218,7 @@ Usage:
 
 E;
 
-            $lists = $this->findCommands();
+            $lists = $this->getCommands();
             $max = 0;
             foreach ($lists as $cmd_name => $cmd_class) {
                 if (strlen($cmd_name) > $max) {

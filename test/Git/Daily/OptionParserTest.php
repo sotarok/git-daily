@@ -16,7 +16,19 @@ class Git_Daily_OptionParserTest
         $opt = new Git_Daily_OptionParser($argv, $option);
         $this->assertEquals($expected, $opt->getOptVar($key));
         $this->assertEquals($args, $opt->getArgs());
+
+        return $opt;
     }
+
+    /**
+     * @depends testOptVar
+     * できない
+     */
+    public function testGetArgv()
+    {
+        var_dump(func_get_args());
+    }
+
 
     public function optVarProvider()
     {

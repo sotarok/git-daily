@@ -36,7 +36,7 @@ class Git_Daily_Command_Help
         $name = reset($args);
 
         if (!empty($name)) {
-            $cmd_class = $this->context->findCommand($name);
+            $cmd_class = $this->context->getCommand($name);
             if (!$cmd_class) {
                 throw new Git_Daily_Exception(
                     "no such subcommand: $name",

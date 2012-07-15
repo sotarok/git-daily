@@ -3,7 +3,7 @@
     "type": "library",
     "description": "git-daily is a git branch management tool using a branching model of gitflow. ",
     "keywords": ["git"],
-    "homepage": "http://gitdaily.strk.jp",
+    "homepage": "http://git-daily.com/",
     "license": "BSD",
     "authors": [
         {
@@ -14,6 +14,6 @@
     ],
     "require": {
         "php": ">=5.2.0",
-        "behat/behat": ">=2.2.2"
+        "behat/behat": "2.4@stable"
     }
 }
