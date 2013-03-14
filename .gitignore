@@ -1,5 +1,6 @@
 git-daily.phar
 composer.phar
+composer.lock
 src/bin/git-daily-local
 tmp/
 vendor/
