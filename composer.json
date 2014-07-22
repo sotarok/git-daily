@@ -13,5 +13,21 @@
     ],
     "support": {
         "issues": "https://github.com/sotarok/git-daily/issues"
+    },
+    "bin": [
+        "git-daily"
+    ],
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
     }
 }
