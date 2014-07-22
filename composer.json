@@ -1,0 +1,33 @@
+{
+    "name": "sotarok/git-daily",
+    "type": "library",
+    "description": "Git-daily is a workflow management tool for Git. Managing branches, releases and remote collaborations.",
+    "keywords": ["git"],
+    "homepage": "http://git-daily.com/",
+    "license": "BSD-4-Clause",
+    "authors": [
+        {
+            "name": "Sotaro Karasawa",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/sotarok/git-daily/issues"
+    },
+    "bin": [
+        "git-daily"
+    ],
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
