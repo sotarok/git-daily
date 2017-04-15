@@ -9,7 +9,7 @@ chmod +x $LOCAL_BIN_FILE
 
 # set
 
-for p in $(echo $PATH | sed -s 's/:/ /g' )
+for p in $(echo $PATH | sed -e 's/:/ /g' )
 do
     if [ "$p" = "$HOME/bin" ]
     then
