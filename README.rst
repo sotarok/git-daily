@@ -1,6 +1,10 @@
 git-daily
 ===========================
 
+==================================================
+[DEPRECATED] git-daily is no longer maintained.
+==================================================
+
 "git-daily" is a tool which helps you to do daily workflow easier.
 
 Sub-commands are::
